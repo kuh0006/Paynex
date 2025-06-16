@@ -6,14 +6,15 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
-  declarations: [],
-  imports: [
+  declarations: [],  imports: [
     CommonModule,
     MatButtonModule,
     MatInputModule,
@@ -25,6 +26,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatSelectModule,
     MatCardModule,
     MatToolbarModule,
+    MatSidenavModule,
+    MatListModule,
   ],
   exports: [
     MatButtonModule,
@@ -37,6 +40,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatSelectModule,
     MatCardModule,
     MatToolbarModule,
+    MatSidenavModule,
+    MatListModule,
   ],
 })
 export class MaterialModule {}

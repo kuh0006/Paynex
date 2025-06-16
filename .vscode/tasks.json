@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Full Stack (API and UI)",
+			"type": "shell",
+			"command": "start powershell -Command \"cd MM.Api && dotnet run\" ; start powershell -Command \"cd mm-ui && npm start\"",
+			"problemMatcher": [],
+			"group": "build",
+			"isBackground": true
+		}
+	]
+}
