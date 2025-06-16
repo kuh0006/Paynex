@@ -1,5 +1,6 @@
 using MM.Repository.Extensions;
 using MM.Services.Extensions;
+using MM.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,10 +9,14 @@ builder.Services.AddRepositoryServices(builder.Configuration);
 builder.Services.AddBusinessServices();
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+SwaggerServiceExtensions.AddOpenApi(builder.Services);
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
