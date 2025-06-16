@@ -6,7 +6,7 @@ namespace MM.Contracts.IMerchant
     {
         Task<IEnumerable<Merchant>> GetAllAsync();
         Task<Merchant?> GetByIdAsync(int id);
-        Task<Merchant?> GetMerchantByNameAsync(string name);
+        Task<IEnumerable<Merchant>> GetMerchantsByNameAsync(string name);
 
         void CreateMerchant(Merchant merchant);
         void UpdateMerchant(Merchant merchant);

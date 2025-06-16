@@ -13,7 +13,6 @@ namespace MM.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        // get all merchants
         [HttpGet("all")]
         public IActionResult GetAllMerchants()
         {
@@ -23,9 +22,8 @@ namespace MM.Api.Controllers
             return Ok(new { Message = "All merchants retrieved successfully." });
         }
 
-        // get merchant by id 
-        [HttpGet("detail/{id}")]
-        public IActionResult GetMerchantById(int id)
+        [HttpGet("{id}")]
+        public IActionResult GetMerchantById([FromRoute] int id)
         {
             _logger.LogInformation("GetMerchantById called for ID: {Id}", id);
             // Here you would typically call a service to get the merchant by ID
@@ -34,10 +32,10 @@ namespace MM.Api.Controllers
         }
 
         //get merchant by name 
-        [HttpGet("detail/name/{name}")]
-        public IActionResult GetMerchantByName(string name)
+        [HttpGet("name/{name}")]
+        public IActionResult GetMerchantsByName(string name)
         {
-            _logger.LogInformation("GetMerchantByName called for Name: {Name}", name);
+            _logger.LogInformation("GetMerchantsByName called for Name: {Name}", name);
             // Here you would typically call a service to get the merchant by name
             // For now, we return a placeholder response
             return Ok(new { Message = $"Merchant details for Name {name} retrieved successfully." });

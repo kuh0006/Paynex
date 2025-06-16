@@ -15,9 +15,10 @@ namespace MM.Repository
         public async Task<Merchant?> GetByIdAsync(int id) =>
             await FindByCondition(merchant => merchant.Id == id).FirstOrDefaultAsync();
 
-        public async Task<Merchant?> GetMerchantByNameAsync(string name) =>
-            await FindByCondition(merchant => merchant.Name.Equals(name)).FirstOrDefaultAsync();
-
+        public async Task<IEnumerable<Merchant>> GetMerchantsByNameAsync(string name) =>
+            await FindByCondition(merchant => merchant.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(merchant => merchant.Name)
+                .ToListAsync();
         public void CreateMerchant(Merchant merchant) => Create(merchant);
 
         public void DeleteMerchant(Merchant merchant) => Delete(merchant);
