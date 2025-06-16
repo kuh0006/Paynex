@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MM.Entities.DTOs.Merchant;
+using MM.Services.Interfaces;
 
 namespace MM.Api.Controllers
 {
@@ -6,20 +8,23 @@ namespace MM.Api.Controllers
     [ApiController]
     public class MerchantController : ControllerBase
     {
+        private readonly IMerchantService _merchantService;
         private readonly ILogger _logger;
 
-        public MerchantController(ILogger<MerchantController> logger)
+        public MerchantController(ILogger<MerchantController> logger, IMerchantService merchantService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _merchantService = merchantService ?? throw new ArgumentNullException(nameof(merchantService));
         }
 
         [HttpGet("all")]
-        public IActionResult GetAllMerchants()
+        public async IActionResult GetAllMerchants()
         {
             _logger.LogInformation("GetAllMerchants called");
-            // Here you would typically call a service to get all merchants
-            // For now, we return a placeholder response
-            return Ok(new { Message = "All merchants retrieved successfully." });
+
+            IEnumerable<MerchantReadDto> merchants =  await _merchantService.GetAllAsync();
+
+
         }
 
         [HttpGet("{id}")]
