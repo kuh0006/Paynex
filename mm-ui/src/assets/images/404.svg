@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="300" height="300">
+  <!-- Background -->
+  <rect width="500" height="500" fill="none"/>
+  
+  <!-- 404 Text -->
+  <text x="250" y="220" font-family="Arial" font-size="100" font-weight="bold" fill="#3f51b5" text-anchor="middle">404</text>
+  
+  <!-- Decorative elements -->
+  <circle cx="250" cy="100" r="50" fill="#f5f5f5" stroke="#3f51b5" stroke-width="8"/>
+  <path d="M150,350 Q250,250 350,350" stroke="#3f51b5" stroke-width="8" fill="none"/>
+  
+  <!-- Sad face -->
+  <circle cx="250" cy="320" r="80" fill="#f5f5f5" stroke="#3f51b5" stroke-width="5"/>
+  <circle cx="220" cy="300" r="10" fill="#3f51b5"/>
+  <circle cx="280" cy="300" r="10" fill="#3f51b5"/>
+  <path d="M210,350 Q250,330 290,350" stroke="#3f51b5" stroke-width="5" fill="none"/>
+</svg>

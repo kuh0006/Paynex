@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MaterialModule } from './shared/material-module';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MaterialModule],
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, MaterialModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

@@ -1,0 +1,49 @@
+.home-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  text-align: center;
+  padding: 40px 0;
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #3f51b5;
+  }
+  
+  .subtitle {
+    font-size: 1.2rem;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 30px;
+  }
+}
+
+.action-buttons {
+  margin: 30px 0;
+  
+  button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-section {
+    padding: 20px 0;
+    
+    h1 {
+      font-size: 2rem;
+    }
+  }
+  
+  .feature-cards {
+    grid-template-columns: 1fr;
+  }
+}

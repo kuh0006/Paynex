@@ -1,7 +1,17 @@
 <div class="app-container mat-app-background">  <mat-toolbar color="primary" class="app-header mat-elevation-z6">
     <div class="header-content">
-      <span class="logo">Paynex - Merchant Management</span>
+      <a routerLink="/" class="logo-link">
+        <span class="logo">Paynex - Merchant Management</span>
+      </a>
       <span class="spacer"></span>
+      <button mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon>home</mat-icon>
+        Home
+      </button>
+      <button mat-button routerLink="/merchants" routerLinkActive="active-link">
+        <mat-icon>store</mat-icon>
+        Merchants
+      </button>
     </div>
   </mat-toolbar>
 
