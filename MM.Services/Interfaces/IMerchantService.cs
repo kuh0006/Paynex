@@ -1,15 +1,15 @@
-﻿using MM.Entities.Models;
+﻿using MM.Entities.DTOs.Merchant;
 
 namespace MM.Services.Interfaces
 {
     public interface IMerchantService
     {
-        Task<Merchant?> GetByIdAsync(int id);
-        Task<IEnumerable<Merchant>> GetByNameAsync(string name);
-        Task<IEnumerable<Merchant>> GetAllAsync();
+        Task<MerchantReadDto?> GetByIdAsync(int id);
+        Task<IEnumerable<MerchantReadDto>> GetByNameAsync(string name);
+        Task<IEnumerable<MerchantReadDto>> GetAllAsync();
 
-        Task CreateAsync(Merchant merchant);
-        Task UpdateAsync(Merchant merchant);
-        Task DeleteAsync(int id);
+        Task<bool> CreateAsync(MerchantCreateDto merchant);
+        Task<bool> UpdateAsync(MerchantUpdateDto merchant);
+        Task<bool> DeleteAsync(int id);
     }
 }
