@@ -1,0 +1,43 @@
+<h2 mat-dialog-title>{{ dialogTitle }}</h2>
+
+<form [formGroup]="merchantForm" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content>
+    <!-- Hidden ID field -->
+    <input type="hidden" formControlName="id">
+    
+    <!-- Name field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="Merchant name" required>
+      <mat-error *ngIf="merchantForm.get('name')?.hasError('required')">Name is required</mat-error>
+      <mat-error *ngIf="merchantForm.get('name')?.hasError('minlength')">Name must be at least 3 characters</mat-error>
+      <mat-error *ngIf="merchantForm.get('name')?.hasError('maxlength')">Name cannot exceed 100 characters</mat-error>
+    </mat-form-field>
+    
+    <!-- Email field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" placeholder="Email address" required>
+      <mat-error *ngIf="merchantForm.get('email')?.hasError('required')">Email is required</mat-error>
+      <mat-error *ngIf="merchantForm.get('email')?.hasError('email')">Please enter a valid email address</mat-error>
+    </mat-form-field>
+    
+    <!-- Category field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Category</mat-label>
+      <mat-select formControlName="category" required>
+        <mat-option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="merchantForm.get('category')?.hasError('required')">Category is required</mat-error>
+    </mat-form-field>
+  </div>
+  
+  <div mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="onCancel()">Cancel</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="merchantForm.invalid">
+      {{ isEditMode ? 'Update' : 'Create' }}
+    </button>
+  </div>
+</form>

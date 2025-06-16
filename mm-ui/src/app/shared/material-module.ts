@@ -8,14 +8,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
-  declarations: [],  imports: [
+  declarations: [],
+  imports: [
     CommonModule,
     MatButtonModule,
     MatInputModule,
@@ -30,6 +33,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatSidenavModule,
     MatListModule,
     MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatSortModule,
   ],
   exports: [
     MatButtonModule,
@@ -44,7 +49,9 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatToolbarModule,
     MatSidenavModule,
     MatListModule,
-     MatPaginatorModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatSortModule,
   ],
 })
 export class MaterialModule {}
