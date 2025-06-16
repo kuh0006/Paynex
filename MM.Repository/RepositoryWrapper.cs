@@ -6,12 +6,12 @@ namespace MM.Repository
 {
     public class RepositoryWrapper : IRepositoryWrapper
     {
-        private RepositoryContext _repoContext;
+        private readonly RepositoryContext _applicationContext;
         private IMerchantRepository? _merchantRepository;
 
-        public RepositoryWrapper(RepositoryContext repositoryContext)
+        public RepositoryWrapper(RepositoryContext applicationContext)
         {
-            _repoContext = repositoryContext;
+            _applicationContext = applicationContext;
         }
 
         public IMerchantRepository Merchant
@@ -19,14 +19,14 @@ namespace MM.Repository
             get
             {
                 if (_merchantRepository == null)
-                    _merchantRepository = new MerchantRepository(_repoContext);
+                    _merchantRepository = new MerchantRepository(_applicationContext);
 
                 return _merchantRepository;
             }
 
         }
 
-        public void Save() => _repoContext.SaveChanges();
-        public async Task SaveAsync() => await _repoContext.SaveChangesAsync();
+        public void Save() => _applicationContext.SaveChanges();
+        public async Task SaveAsync() => await _applicationContext.SaveChangesAsync();
     }
 }

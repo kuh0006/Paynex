@@ -8,19 +8,19 @@ namespace MM.Repository
 {
     public class RepositoryBase<T> : IRepositoryBase<T> where T : class
     {
-        protected RepositoryContext RepositoryContext { get; set; }
+        protected RepositoryContext ApplicationContext { get; set; }
 
-        public RepositoryBase(RepositoryContext repositoryContext) => RepositoryContext = repositoryContext;
+        public RepositoryBase(RepositoryContext repositoryContext) => ApplicationContext = repositoryContext;
 
-        public void Create(T entity) => RepositoryContext.Set<T>().Add(entity);
+        public void Create(T entity) => ApplicationContext.Set<T>().Add(entity);
 
-        public void Delete(T entity) => RepositoryContext.Set<T>().Remove(entity);
+        public void Delete(T entity) => ApplicationContext.Set<T>().Remove(entity);
 
-        public IQueryable<T> FindAll() => RepositoryContext.Set<T>().AsNoTracking();
+        public IQueryable<T> FindAll() => ApplicationContext.Set<T>().AsNoTracking();
 
         public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression) =>
-            RepositoryContext.Set<T>().Where(expression).AsNoTracking();
+            ApplicationContext.Set<T>().Where(expression).AsNoTracking();
 
-        public void Update(T entity) => RepositoryContext.Set<T>().Update(entity);
+        public void Update(T entity) => ApplicationContext.Set<T>().Update(entity);
     }
 }
