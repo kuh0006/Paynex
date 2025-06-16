@@ -6,6 +6,7 @@ namespace MM.Entities.DTOs.Merchant
     public class MerchantCreateDto
     {
         [Required]
+        [MinLength(3)]
         [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
 

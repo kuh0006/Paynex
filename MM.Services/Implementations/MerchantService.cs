@@ -20,7 +20,7 @@ namespace MM.Services.Implementations
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<bool> CreateAsync(MerchantCreateDto merchant)
+        public async Task<int> CreateAsync(MerchantCreateDto merchant)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace MM.Services.Implementations
                 await _repository.SaveAsync();
                 _logger.LogInformation("Merchant with name: {Name} created successfully", merchant.Name);
 
-                return true;
+                return merchantEntity.Id;
             }
             catch (Exception ex)
             {
@@ -161,6 +161,7 @@ namespace MM.Services.Implementations
                 }
 
                 _mapper.Map(merchant, existingMerchant);
+                _repository.Merchant.Update(existingMerchant);
 
                 await _repository.SaveAsync();
                 _logger.LogInformation("Merchant with ID: {Id} updated successfully", merchant.Id);

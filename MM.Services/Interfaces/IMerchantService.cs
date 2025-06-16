@@ -8,7 +8,7 @@ namespace MM.Services.Interfaces
         Task<IEnumerable<MerchantReadDto>> GetByNameAsync(string name);
         Task<IEnumerable<MerchantReadDto>> GetAllAsync();
 
-        Task<bool> CreateAsync(MerchantCreateDto merchant);
+        Task<int> CreateAsync(MerchantCreateDto merchant);
         Task<bool> UpdateAsync(MerchantUpdateDto merchant);
         Task<bool> DeleteAsync(int id);
     }

@@ -10,6 +10,7 @@ namespace MM.Entities.Models
 
         [Required]
         [MinLength(3)]
+        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
 
         [Required]

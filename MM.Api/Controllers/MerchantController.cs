@@ -52,7 +52,6 @@ namespace MM.Api.Controllers
             return Ok(ApiResponse<MerchantReadDto>.SuccessResponse(merchant, "Merchant retrieved successfully."));
         }
 
-        //get merchant by name 
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetMerchantsByName(string name)
         {
@@ -76,7 +75,31 @@ namespace MM.Api.Controllers
             return Ok(ApiResponse<IEnumerable<MerchantReadDto>>.SuccessResponse(merchants, "Merchants retrieved successfully."));
         }
 
-        // update merchant by id
+        // Create a new merchant
+        [HttpPost]
+        public async Task<IActionResult> CreateMerchant([FromBody] MerchantCreateDto merchantCreate)
+        {
+            _logger.LogInformation("CreateMerchant called");
+
+            if (merchantCreate == null)
+            {
+                _logger.LogError("MerchantCreateDto is null");
+                return BadRequest(ApiResponse<bool>.FailResponse("Merchant creation data cannot be null."));
+            }
+
+            // Create the merchant
+            int merchantID = await _merchantService.CreateAsync(merchantCreate);
+
+            if (merchantID <= 0)
+            {
+                _logger.LogError("Failed to create merchant");
+                return BadRequest(ApiResponse<bool>.FailResponse("Merchant creation failed."));
+            }
+
+            _logger.LogInformation("Merchant created successfully with ID: {Id}", merchantID);
+            return CreatedAtAction(nameof(GetMerchantById), new { id = merchantID }, ApiResponse<int>.SuccessResponse(merchantID, "Merchant created successfully."));
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMerchant([FromRoute] int id, [FromBody] MerchantUpdateDto merchantUpdate)
         {
