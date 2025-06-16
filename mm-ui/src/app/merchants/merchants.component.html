@@ -1,1 +1,106 @@
-<p>Works</p>
+<div class="merchants-container">
+  <div class="header-section">
+    <h2 class="title">Merchant Management</h2>
+    <div class="actions">
+      <button mat-raised-button color="primary" class="add-button">
+        <mat-icon>add</mat-icon>
+        Add Merchant
+      </button>
+    </div>
+  </div>
+
+  <mat-card class="merchant-table-container mat-elevation-z3">
+    <mat-card-content>
+      <!-- Filter and search controls -->
+      <div class="table-controls">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search merchants</mat-label>
+          <input matInput placeholder="Search by name or email">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="category-filter">
+          <mat-label>Filter by category</mat-label>
+          <mat-select>
+            <mat-option value="">All Categories</mat-option>
+            <mat-option value="Retail">Retail</mat-option>
+            <mat-option value="Food">Food</mat-option>
+            <mat-option value="Services">Services</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      
+      <!-- Merchant table -->
+      <div class="table-responsive">
+        <table mat-table [dataSource]="merchants">
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let merchant">{{merchant.id}}</td>
+          </ng-container>
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let merchant">
+              <div class="merchant-name">{{merchant.name}}</div>
+            </td>
+          </ng-container>
+
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let merchant">{{merchant.email}}</td>
+          </ng-container>
+
+          <!-- Category Column -->
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef>Category</th>
+            <td mat-cell *matCellDef="let merchant">
+              <span class="category-chip" [ngClass]="merchant.category.toLowerCase()">
+                {{merchant.category}}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Created At Column -->
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>Created On</th>
+            <td mat-cell *matCellDef="let merchant">{{merchant.createdAt | date:'mediumDate'}}</td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let merchant">
+              <div class="action-buttons">
+                <button mat-icon-button color="primary" matTooltip="Edit merchant">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" matTooltip="Delete merchant">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+      
+      <!-- Empty state message -->      <div class="empty-state" *ngIf="merchants.length === 0">
+        <mat-icon>store_off</mat-icon>
+        <p>No merchants found.</p>
+        <p class="hint">Click the "Add Merchant" button to create your first merchant.</p>
+      </div>
+      
+      <!-- Pagination -->
+      <mat-paginator 
+        [pageSize]="10" 
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        showFirstLastButtons>
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>
