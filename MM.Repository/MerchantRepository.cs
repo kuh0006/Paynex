@@ -13,7 +13,7 @@ namespace MM.Repository
             await FindAll().OrderBy(merchant => merchant.Name).ToListAsync();
 
         public async Task<Merchant?> GetByIdAsync(int id) =>
-            await FindByCondition(merchant => merchant.Id.Equals(id)).FirstOrDefaultAsync();
+            await FindByCondition(merchant => merchant.Id == id).FirstOrDefaultAsync();
 
         public async Task<Merchant?> GetMerchantByNameAsync(string name) =>
             await FindByCondition(merchant => merchant.Name.Equals(name)).FirstOrDefaultAsync();
