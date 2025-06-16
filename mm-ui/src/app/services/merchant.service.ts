@@ -8,7 +8,7 @@ import { Merchant } from '../models/merchant.model';
   providedIn: 'root'
 })
 export class MerchantService {
-  private endpoint = 'merchants';
+  private endpoint = 'merchant';
 
   constructor(private crudService: CrudService) { }
   /**
@@ -16,8 +16,9 @@ export class MerchantService {
    * @returns Observable of merchant array
    */
   getAllMerchants(): Observable<Merchant[]> {
-    return this.crudService.getAll<Merchant>(this.endpoint).pipe(
+    return this.crudService.getAll<Merchant>(`${this.endpoint}/all`).pipe(
       map((response: HttpResponse<Merchant[]>) => {
+        console.log('Response from getAllMerchants:', response);
         return response.body || [];
       })
     );
@@ -79,19 +80,6 @@ export class MerchantService {
    */
   searchMerchantsByName(name: string): Observable<Merchant[]> {
     const route = `${this.endpoint}/search?name=${encodeURIComponent(name)}`;
-    return this.crudService.getAll<Merchant>(route).pipe(
-      map((response: HttpResponse<Merchant[]>) => {
-        return response.body || [];
-      })
-    );
-  }
-  /**
-   * Filters merchants by category.
-   * @param category The category to filter by
-   * @returns Observable of merchant array
-   */
-  filterMerchantsByCategory(category: string): Observable<Merchant[]> {
-    const route = `${this.endpoint}/filter?category=${encodeURIComponent(category)}`;
     return this.crudService.getAll<Merchant>(route).pipe(
       map((response: HttpResponse<Merchant[]>) => {
         return response.body || [];
