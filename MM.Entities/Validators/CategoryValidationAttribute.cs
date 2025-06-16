@@ -8,7 +8,7 @@ namespace MM.Entities.Validators
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            if (value is string str && Allowed.Contains(str))
+            if (value is string str && Allowed.Any(a => string.Equals(a, str, StringComparison.OrdinalIgnoreCase)))
                 return ValidationResult.Success;
 
             return new ValidationResult($"Category must be one of: {string.Join(", ", Allowed)}");

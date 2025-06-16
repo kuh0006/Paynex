@@ -161,7 +161,7 @@ namespace MM.Services.Implementations
                 }
 
                 _mapper.Map(merchant, existingMerchant);
-                _repository.Merchant.Update(existingMerchant);
+                _repository.Merchant.UpdateMerchant(existingMerchant);
 
                 await _repository.SaveAsync();
                 _logger.LogInformation("Merchant with ID: {Id} updated successfully", merchant.Id);
