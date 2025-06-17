@@ -18,8 +18,9 @@ import {
   startWith,
   finalize,
   switchMap,
+  map,
 } from 'rxjs/operators';
-import { Subject, Observable, combineLatest, BehaviorSubject } from 'rxjs';
+import { Subject, Observable, combineLatest, BehaviorSubject, merge } from 'rxjs';
 
 import { Merchant, MERCHANT_CATEGORIES } from '../models/merchant.model';
 import { MerchantService } from '../services/merchant.service';
@@ -56,15 +57,11 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
   private merchants$ = new BehaviorSubject<Merchant[]>([]);
   private filteredMerchants$: Observable<Merchant[]>;
   private destroy$ = new Subject<void>();
+  private manualRefresh$ = new Subject<void>(); 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
-  constructor(
-    private merchantService: MerchantService,
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar
-  ) {
-    this.filteredMerchants$ = combineLatest([
+  constructor(private merchantService: MerchantService, private dialog: MatDialog, private snackBar: MatSnackBar) {
+    const formFilters$ = combineLatest([
       this.searchControl.valueChanges.pipe(
         startWith(''),
         debounceTime(400),
@@ -74,14 +71,23 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
         startWith(''),
         distinctUntilChanged()
       ),
-    ]).pipe(
-      switchMap(([searchTerm, category]) => {
-        if (!searchTerm && !category) return this.merchants$.asObservable();
+    ]);
+
+    const manualFilters$ = this.manualRefresh$.pipe(
+      map(() => [this.searchControl.value || '', this.categoryFilter.value || ''] as [string, string])
+    );
+
+    this.filteredMerchants$ = merge(formFilters$, manualFilters$).pipe(      switchMap(([searchTerm, category]) => {
+        const search = (searchTerm || '').trim();
+        const cat = (category || '').trim();
+        
+        if (!search && !cat) 
+          return this.merchants$.asObservable();
 
         this.isLoading = true;
         this.error = null;
         return this.merchantService
-          .filterByAsync(searchTerm || '', category || '')
+          .filterByAsync(search, cat)
           .pipe(finalize(() => (this.isLoading = false)));
       })
     );
@@ -157,6 +163,22 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       (m: Merchant) => m.id !== merchantId
     );
     this.merchants$.next(filteredMerchants);
+  }  private refreshFilters(): void {
+    // Spustí znovu filtrovanie s aktuálnymi hodnotami
+    const currentSearch = (this.searchControl.value || '').trim();
+    const currentCategory = (this.categoryFilter.value || '').trim();
+
+    console.log('RefreshFilters - currentSearch:', `"${currentSearch}"`, 'currentCategory:', `"${currentCategory}"`);
+
+    // Ak sú filtre prázdne, nie je potrebné nič robiť (lokálny cache sa aktualizoval)
+    if (!currentSearch && !currentCategory) {
+      console.log('No filters active, skipping refresh');
+      return;
+    }
+
+    // Manuálny trigger filtrovania
+    console.log('Triggering manual refresh');
+    this.manualRefresh$.next();
   }
 
   confirmDelete(merchant: Merchant): void {
@@ -179,7 +201,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-
   private deleteMerchant(id: number): void {
     this.isLoading = true;
     this.merchantService
@@ -191,6 +212,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe({
         next: () => {
           this.removeLocalMerchant(id);
+          this.refreshFilters(); // Refresh filtre po DELETE
           this.snackBar.open('Merchant deleted successfully', 'Close', {
             duration: 3000,
           });
@@ -216,10 +238,10 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
           .pipe(
             finalize(() => (this.isLoading = false)),
             takeUntil(this.destroy$)
-          )
-          .subscribe({
+          )          .subscribe({
             next: (createdMerchant) => {
               this.addLocalMerchant(createdMerchant);
+              this.refreshFilters(); 
               this.snackBar.open('Merchant created successfully', 'Close', {
                 duration: 3000,
               });
@@ -246,10 +268,10 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
           .pipe(
             finalize(() => (this.isLoading = false)),
             takeUntil(this.destroy$)
-          )
-          .subscribe({
+          )          .subscribe({
             next: (updatedMerchant) => {
               this.updateLocalMerchant(updatedMerchant);
+              this.refreshFilters();
               this.snackBar.open('Merchant updated successfully', 'Close', {
                 duration: 3000,
               });
