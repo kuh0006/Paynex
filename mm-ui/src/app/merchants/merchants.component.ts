@@ -1,17 +1,20 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { finalize } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 import { Merchant, MERCHANT_CATEGORIES } from '../models/merchant.model';
 import { MerchantService } from '../services/merchant.service';
 import { MaterialModule } from '../shared/material-module';
 import { MerchantDialogComponent } from './merchant-dialog/merchant-dialog.component';
+import { ConfirmDialogComponent } from '../shared/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-merchants',
@@ -20,7 +23,7 @@ import { MerchantDialogComponent } from './merchant-dialog/merchant-dialog.compo
   standalone: true,
   imports: [CommonModule, MaterialModule, ReactiveFormsModule],
 })
-export class MerchantsComponent implements OnInit, AfterViewInit {
+export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
   // Table configuration
   displayedColumns: string[] = [
     'id',
@@ -36,13 +39,18 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
 
   searchControl = new FormControl('');
   categoryFilter = new FormControl('');
-
   isLoading = false;
   error: string | null = null;
+  
+  private destroy$ = new Subject<void>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   
-  constructor(private merchantService: MerchantService, private dialog: MatDialog) {}
+  constructor(
+    private merchantService: MerchantService, 
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
+  ) {}
   
   ngOnInit(): void {
     this.loadMerchants();
@@ -54,17 +62,21 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   
   loadMerchants(): void {
     this.isLoading = true;
-    this.error = null;
-
-    this.merchantService.getAllMerchants()
+    this.error = null;    this.merchantService.getAllMerchants()
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: (merchants) => {
           this.dataSource.data = merchants;
-          console.log('Loaded merchants:', merchants.length);
+          // Remove console.log for production, could add if needed: 
+          // this.snackBar.open(`Loaded ${merchants.length} merchants`, 'Close', { duration: 2000 });
         },
         error: (error) => {
           console.error('Error loading merchants:', error);
@@ -73,17 +85,21 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       });
   }
 
-  
-  setupCombinedFilter(): void {
+    setupCombinedFilter(): void {
     // Set up search with debounce
     this.searchControl.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged())
+      .pipe(
+        debounceTime(400), 
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
       .subscribe(() => {
         this.applyFilters();
       });
       
     // Set up category filter
     this.categoryFilter.valueChanges
+      .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.applyFilters();
       });
@@ -108,10 +124,9 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
     this.merchantService
       .filterByAsync(name, category)
       .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe({
-        next: (merchants) => {
+      .subscribe({        next: (merchants) => {
           this.dataSource.data = merchants;
-          console.log('Combined filter results:', merchants.length);
+          // Optional: this.snackBar.open(`Found ${merchants.length} merchants`, 'Close', { duration: 2000 });
         },
         error: (error) => {
           console.error('Error filtering merchants:', error);
@@ -119,28 +134,46 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
         },
       });
   }
+  
+  confirmDelete(merchant: Merchant): void {    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '450px',
+      maxWidth: '90vw',
+      disableClose: true,
+      panelClass: 'confirm-dialog-panel',
+      data: {
+        title: 'Delete Merchant',
+        message: `Are you sure you want to permanently delete "${merchant.name}"? This action cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteMerchant(merchant.id!);
+      }
+    });
+  }
   /**
    * Deletes a merchant
    */
-  deleteMerchant(id: number): void {
-    if (confirm('Are you sure you want to delete this merchant?')) {
-      this.isLoading = true;
-      this.merchantService
-        .deleteMerchant(id)
-        .pipe(finalize(() => (this.isLoading = false)))
-        .subscribe({
-          next: () => {
-            this.loadMerchants();
-            console.log('Merchant deleted successfully');
-            // We could add a snackbar notification here
-          },
-          error: (error) => {
-            console.error('Error deleting merchant:', error);
-            this.error = 'Failed to delete merchant. Please try again.';
-          },
-        });
-    }
+  private deleteMerchant(id: number): void {
+    this.isLoading = true;
+    this.merchantService
+      .deleteMerchant(id)
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: () => {
+          this.loadMerchants();
+          this.snackBar.open('Merchant deleted successfully', 'Close', {
+            duration: 3000
+          });
+        },
+        error: (error) => {
+          console.error('Error deleting merchant:', error);
+          this.error = 'Failed to delete merchant. Please try again.';
+        },
+      });
   }
   
 
@@ -156,10 +189,11 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
         this.merchantService
           .createMerchant(result)
           .pipe(finalize(() => (this.isLoading = false)))
-          .subscribe({
-            next: () => {
+          .subscribe({            next: () => {
               this.loadMerchants();
-              console.log('Merchant created successfully');
+              this.snackBar.open('Merchant created successfully', 'Close', {
+                duration: 3000
+              });
             },
             error: (error) => {
               console.error('Error creating merchant:', error);
@@ -182,10 +216,11 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
         this.merchantService
           .updateMerchant(merchant.id as number, result)
           .pipe(finalize(() => (this.isLoading = false)))
-          .subscribe({
-            next: () => {
+          .subscribe({            next: () => {
               this.loadMerchants();
-              console.log('Merchant updated successfully');
+              this.snackBar.open('Merchant updated successfully', 'Close', {
+                duration: 3000
+              });
             },
             error: (error) => {
               console.error('Error updating merchant:', error);

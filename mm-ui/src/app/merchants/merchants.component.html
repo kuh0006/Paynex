@@ -136,12 +136,11 @@
                   (click)="openEditMerchantDialog(merchant)"
                 >
                   <mat-icon>edit</mat-icon>
-                </button>
-                <button
+                </button>                <button
                   mat-icon-button
                   color="warn"
                   matTooltip="Delete merchant"
-                  (click)="deleteMerchant(merchant.id!)"
+                  (click)="confirmDelete(merchant)"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
