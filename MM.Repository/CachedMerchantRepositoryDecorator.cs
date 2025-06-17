@@ -31,7 +31,8 @@ namespace MM.Repository
 
         public void Delete(Merchant entity)
         {
-            _innerRepository.Delete(entity);
+            entity.IsDeleted = true; // Mark as deleted instead of removing from DB
+            _innerRepository.DeleteMerchant(entity);
 
             if (_cache.TryGetValue(CacheKey_AllMerchants, out IEnumerable<Merchant>? allCached))
             {

@@ -11,22 +11,29 @@ namespace MM.Repository
         public MerchantRepository(RepositoryContext repositoryContext) : base(repositoryContext) { }
 
         public async Task<IEnumerable<Merchant>> GetAllAsync() =>
-            await FindAll().OrderBy(merchant => merchant.Name).ToListAsync();
+            await FindByCondition(merchant => !merchant.IsDeleted)
+                    .OrderBy(merchant => merchant.Name)
+                        .ToListAsync();
 
         public async Task<Merchant?> GetByIdAsync(int id) =>
-            await FindByCondition(merchant => merchant.Id == id).FirstOrDefaultAsync();
-
+            await FindByCondition(merchant => merchant.Id == id && !merchant.IsDeleted)
+                    .FirstOrDefaultAsync();
         public async Task<IEnumerable<Merchant>> GetFilteredAsync(IFilter<Merchant> filter)
         {
-            var data = await FindAll().OrderBy(merchant => merchant.Name)
-                        .ToListAsync();
+            List<Merchant> data = await FindByCondition(merchant => !merchant.IsDeleted)
+                                         .OrderBy(merchant => merchant.Name)
+                                            .ToListAsync();
 
             return [.. data.Where(filter.IsSatisfiedBy)];
         }
 
         public void CreateMerchant(Merchant merchant) => Create(merchant);
 
-        public void DeleteMerchant(Merchant merchant) => Delete(merchant);
+        public void DeleteMerchant(Merchant merchant)
+        {
+            merchant.IsDeleted = true;
+            UpdateMerchant(merchant);
+        }
 
         public void UpdateMerchant(Merchant merchant) => Update(merchant);
     }
