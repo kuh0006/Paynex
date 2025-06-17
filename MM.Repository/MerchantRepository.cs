@@ -20,6 +20,7 @@ namespace MM.Repository
                     .FirstOrDefaultAsync();
         public async Task<IEnumerable<Merchant>> GetFilteredAsync(IFilter<Merchant> filter)
         {
+            // This could be done in DB instead of in memory, because of lack of time it is done in memory
             List<Merchant> data = await FindByCondition(merchant => !merchant.IsDeleted)
                                          .OrderBy(merchant => merchant.Name)
                                             .ToListAsync();
