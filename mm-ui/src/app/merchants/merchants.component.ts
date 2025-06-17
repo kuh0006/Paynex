@@ -127,6 +127,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dataSource.data = filteredMerchants;
       });
   }
+  
   private filterMerchantsLocally(
     merchants: Merchant[],
     searchTerm: string,
