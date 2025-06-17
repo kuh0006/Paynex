@@ -16,10 +16,10 @@ import {
   distinctUntilChanged,
   takeUntil,
   startWith,
-  map,
   finalize,
+  switchMap,
 } from 'rxjs/operators';
-import { Subject, BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { Subject, Observable, combineLatest, BehaviorSubject } from 'rxjs';
 
 import { Merchant, MERCHANT_CATEGORIES } from '../models/merchant.model';
 import { MerchantService } from '../services/merchant.service';
@@ -53,21 +53,21 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = false;
   error: string | null = null;
 
-  private destroy$ = new Subject<void>();
-
-  // Observable approach
   private merchants$ = new BehaviorSubject<Merchant[]>([]);
   private filteredMerchants$: Observable<Merchant[]>;
+  private destroy$ = new Subject<void>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private merchantService: MerchantService, private dialog: MatDialog, private snackBar: MatSnackBar) {
-    // Reactive filtering
+  constructor(
+    private merchantService: MerchantService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
+  ) {
     this.filteredMerchants$ = combineLatest([
-      this.merchants$.asObservable(),
       this.searchControl.valueChanges.pipe(
         startWith(''),
-        debounceTime(300),
+        debounceTime(400),
         distinctUntilChanged()
       ),
       this.categoryFilter.valueChanges.pipe(
@@ -75,19 +75,20 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
         distinctUntilChanged()
       ),
     ]).pipe(
-      map(([merchants, searchTerm, category]) => {
-        return this.filterMerchantsLocally(
-          merchants,
-          searchTerm || '',
-          category || ''
-        );
+      switchMap(([searchTerm, category]) => {
+        if (!searchTerm && !category) return this.merchants$.asObservable();
+
+        this.isLoading = true;
+        this.error = null;
+        return this.merchantService
+          .filterByAsync(searchTerm || '', category || '')
+          .pipe(finalize(() => (this.isLoading = false)));
       })
     );
   }
-
   ngOnInit(): void {
     this.loadMerchants();
-    this.setupObservableSubscription();
+    this.setupFilteringSubscription();
   }
 
   ngAfterViewInit(): void {
@@ -111,7 +112,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       )
       .subscribe({
         next: (merchants) => {
-          this.merchants$.next(merchants); //
+          this.merchants$.next(merchants);
         },
         error: (error) => {
           console.error('Error loading merchants:', error);
@@ -120,43 +121,31 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  private setupObservableSubscription(): void {
-    this.filteredMerchants$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((filteredMerchants) => {
-        this.dataSource.data = filteredMerchants;
-      });
-  }
-  
-  private filterMerchantsLocally(
-    merchants: Merchant[],
-    searchTerm: string,
-    category: string
-  ): Merchant[] {
-    return merchants.filter((merchant) => {
-      const matchesSearch =
-        !searchTerm ||
-        merchant.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesCategory = !category || merchant.category === category;
-
-      return matchesSearch && matchesCategory;
+  private setupFilteringSubscription(): void {
+    this.filteredMerchants$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (merchants) => {
+        this.dataSource.data = merchants;
+      },
+      error: (error) => {
+        console.error('Error loading merchants:', error);
+        this.error = 'Failed to load merchants. Please try again.';
+        this.isLoading = false;
+      },
     });
   }
 
   private updateLocalMerchant(updatedMerchant: Merchant): void {
     const currentMerchants = this.merchants$.value;
-   
     const index = currentMerchants.findIndex(
-      (m) => m.id === updatedMerchant.id
+      (m: Merchant) => m.id === updatedMerchant.id
     );
 
     if (index >= 0) {
       currentMerchants[index] = updatedMerchant;
       this.merchants$.next([...currentMerchants]);
     }
-
   }
+
   private addLocalMerchant(newMerchant: Merchant): void {
     const currentMerchants = this.merchants$.value;
     this.merchants$.next([...currentMerchants, newMerchant]);
@@ -165,7 +154,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
   private removeLocalMerchant(merchantId: number): void {
     const currentMerchants = this.merchants$.value;
     const filteredMerchants = currentMerchants.filter(
-      (m) => m.id !== merchantId
+      (m: Merchant) => m.id !== merchantId
     );
     this.merchants$.next(filteredMerchants);
   }
@@ -243,7 +232,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-
   openEditMerchantDialog(merchant: Merchant): void {
     const dialogRef = this.dialog.open(MerchantDialogComponent, {
       width: '400px',
@@ -258,7 +246,8 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
           .pipe(
             finalize(() => (this.isLoading = false)),
             takeUntil(this.destroy$)
-          )          .subscribe({
+          )
+          .subscribe({
             next: (updatedMerchant) => {
               this.updateLocalMerchant(updatedMerchant);
               this.snackBar.open('Merchant updated successfully', 'Close', {
