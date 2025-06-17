@@ -75,7 +75,7 @@ namespace MM.Api.Controllers
             if (result == null || !result.Any())
             {
                 _logger.LogInformation("No merchants found matching the filter criteria");
-                return NotFound(ApiResponse<IEnumerable<MerchantReadDto>>.NotFound("No matching merchants found."));
+                return Ok(ApiResponse<IEnumerable<MerchantReadDto>>.NotFound("No matching merchants found."));
             }
 
             _logger.LogInformation("Filtered merchants retrieved successfully, count: {Count}", result.Count());
