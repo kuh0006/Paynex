@@ -15,15 +15,13 @@ export class App implements OnInit {
   protected isSmallScreen = false;
   
   constructor(private breakpointObserver: BreakpointObserver) {}
-  
-  ngOnInit() {
+    ngOnInit() {
     // Monitor screen size changes for responsive adjustments
     this.breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
     ]).subscribe(result => {
       this.isSmallScreen = result.matches;
-      // No need to adjust sidebar - we'll use only top navigation
     });
   }
 }

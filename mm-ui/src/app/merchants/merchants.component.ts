@@ -42,11 +42,12 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-
   constructor(
     private merchantService: MerchantService,
     private dialog: MatDialog
-  ) {}  ngOnInit(): void {
+  ) {}
+  
+  ngOnInit(): void {
     this.loadMerchants();
 
     // Set up combined search/filter functionality
@@ -78,7 +79,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
         },
       });
   }
-  
+
   /**
    * Sets up combined filtering by name and category
    */
