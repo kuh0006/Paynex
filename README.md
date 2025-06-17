@@ -110,11 +110,13 @@ The app will open at http://localhost:4200
 ## Technologies we used
 
 **Frontend (what users see):**
+
 - Angular 20+ - main framework
 - Angular Material - nice looking components
 - TypeScript - programming language
 
 **Backend (server side):**
+
 - ASP.NET Core Web API - handles requests
 - Entity Framework Core - works with database
 - MS SQL Server - stores data
@@ -122,16 +124,19 @@ The app will open at http://localhost:4200
 ## Troubleshooting
 
 **Problem: Database won't create**
+
 - Make sure SQL Server is running
 - Check if you have the right connection string
 - Try running the database update command again
 
 **Problem: Frontend won't start**
+
 - Make sure Node.js is installed
 - Try deleting the `node_modules` folder and run `npm install` again
 - Check if you're using Node.js version 18 or newer
 
 **Problem: API won't start**
+
 - Make sure .NET SDK is installed
 - Try running `dotnet restore` first
 - Check if ports 7111 (HTTPS) or 5290 (HTTP) are already being used
