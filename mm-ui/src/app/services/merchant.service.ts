@@ -39,15 +39,15 @@ export class MerchantService {
       );
   }
 
-  updateMerchant(id: number, merchant: Merchant): Observable<boolean> {
+  updateMerchant(id: number, merchant: Merchant): Observable<Merchant> {
     const route = `${this.endpoint}/${id}`;
     return this.crudService
-      .updateWrapped<Merchant, boolean>(route, merchant)
+      .updateWrapped<Merchant, Merchant>(route, merchant)
       .pipe(
-        map((response: ApiResponse<boolean>) =>
-          this.extractDataFromResponse<boolean>(response)
+        map((response: ApiResponse<Merchant>) =>
+          this.extractDataFromResponse<Merchant>(response)
         ),
-        catchError(this.handleError<boolean>(`updateMerchant(${id})`))
+        catchError(this.handleError<Merchant>(`updateMerchant(${id})`))
       );
   }
 

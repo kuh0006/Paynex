@@ -142,7 +142,7 @@ namespace MM.Services.Implementations
             }
         }
 
-        public async Task<bool> UpdateAsync(MerchantUpdateDto merchant)
+        public async Task<Merchant?> UpdateAsync(MerchantUpdateDto merchant)
         {
             try
             {
@@ -154,10 +154,11 @@ namespace MM.Services.Implementations
                 }
 
                 Merchant? existingMerchant = await _repository.Merchant.GetByIdAsync(merchant.Id);
+                
                 if (existingMerchant == null)
                 {
                     _logger.LogWarning("Merchant with ID: {Id} not found", merchant.Id);
-                    return false;
+                    return null;
                 }
 
                 _mapper.Map(merchant, existingMerchant);
@@ -165,7 +166,8 @@ namespace MM.Services.Implementations
 
                 await _repository.SaveAsync();
                 _logger.LogInformation("Merchant with ID: {Id} updated successfully", merchant.Id);
-                return true;
+
+                return existingMerchant;
             }
             catch (Exception ex)
             {

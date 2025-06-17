@@ -260,11 +260,9 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
           .pipe(
             finalize(() => (this.isLoading = false)),
             takeUntil(this.destroy$)
-          )
-          .subscribe({
-            next: () => {
-              const merchantToUpdate = { ...merchant, ...result };
-              this.updateLocalMerchant(merchantToUpdate);
+          )          .subscribe({
+            next: (updatedMerchant) => {
+              this.updateLocalMerchant(updatedMerchant);
               this.snackBar.open('Merchant updated successfully', 'Close', {
                 duration: 3000,
               });

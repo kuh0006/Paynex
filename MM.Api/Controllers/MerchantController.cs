@@ -116,33 +116,33 @@ namespace MM.Api.Controllers
             if (merchantUpdate == null)
             {
                 _logger.LogError("MerchantUpdateDto is null");
-                return BadRequest(ApiResponse<bool>.FailResponse("Merchant update data cannot be null."));
+                return BadRequest(ApiResponse<Merchant>.FailResponse("Merchant update data cannot be null."));
             }
 
             if (id <= 0)
             {
                 _logger.LogError("Invalid ID: {Id}", id);
-                return BadRequest(ApiResponse<bool>.FailResponse("Invalid merchant ID."));
+                return BadRequest(ApiResponse<Merchant>.FailResponse("Invalid merchant ID."));
             }
 
             // Ensure the ID in the DTO matches the route parameter
             if (merchantUpdate.Id != id)
             {
                 _logger.LogError("ID mismatch: Route ID {RouteId} does not match DTO ID {DtoId}", id, merchantUpdate.Id);
-                return BadRequest(ApiResponse<bool>.FailResponse("ID in the request body does not match the route ID."));
+                return BadRequest(ApiResponse<Merchant>.FailResponse("ID in the request body does not match the route ID."));
             }
 
             _logger.LogInformation("Updating merchant with ID: {Id}", id);
-            bool result = await _merchantService.UpdateAsync(merchantUpdate);
+            Merchant? result = await _merchantService.UpdateAsync(merchantUpdate);
 
-            if (!result)
+            if (result == null)
             {
                 _logger.LogError("Failed to update merchant with ID: {Id}", id);
-                return NotFound(ApiResponse<bool>.NotFound("Merchant not found or update failed."));
+                return NotFound(ApiResponse<Merchant>.NotFound("Merchant not found or update failed."));
             }
 
             _logger.LogInformation("Merchant with ID: {Id} updated successfully", id);
-            return Ok(ApiResponse<bool>.SuccessResponse(true, "Merchant updated successfully."));
+            return Ok(ApiResponse<Merchant>.SuccessResponse(result, "Merchant updated successfully."));
         }
 
         [HttpDelete("{id}")]
