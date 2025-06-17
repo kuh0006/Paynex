@@ -127,7 +127,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dataSource.data = filteredMerchants;
       });
   }
-
   private filterMerchantsLocally(
     merchants: Merchant[],
     searchTerm: string,
@@ -136,8 +135,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
     return merchants.filter((merchant) => {
       const matchesSearch =
         !searchTerm ||
-        merchant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        merchant.email.toLowerCase().includes(searchTerm.toLowerCase());
+        merchant.name.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCategory = !category || merchant.category === category;
 
