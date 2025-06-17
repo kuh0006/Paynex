@@ -1,30 +1,46 @@
+// Variables
+$primary-color: #3f51b5;
+$primary-light: #5c6bc0;
+$error-bg: #ffebee;
+$spacing-std: 16px;
+$spacing-lg: 20px;
+$border-radius: 4px;
+
+// Category chip colors
+$category-colors: (
+  'retail': (bg: rgba(33, 150, 243, 0.1), text: #1976d2),
+  'food': (bg: rgba(76, 175, 80, 0.1), text: #388e3c),
+  'services': (bg: rgba(156, 39, 176, 0.1), text: #7b1fa2)
+);
+
+// Layout
 .merchants-container {
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
 }
 
+// Header
 .header-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: $spacing-lg;
   
   .title {
     margin: 0;
     font-size: 24px;
     font-weight: 500;
-    color: #3f51b5;
-  }
-  
-  .add-button {
-    .mat-icon {
-      margin-right: 8px;
-    }
+    color: $primary-color;
   }
 }
 
-// Loading overlay
+// Icon in button
+.mat-icon {
+  margin-right: 8px;
+}
+
+// Feedback states
 .loading-overlay {
   position: absolute;
   top: 0;
@@ -38,14 +54,13 @@
   z-index: 10;
 }
 
-// Error message
 .error-message {
   display: flex;
   align-items: center;
   padding: 10px;
   margin-bottom: 15px;
-  background-color: #ffebee;
-  border-radius: 4px;
+  background-color: $error-bg;
+  border-radius: $border-radius;
   
   mat-icon {
     margin-right: 10px;
@@ -56,110 +71,105 @@
   }
 }
 
+// Table container
 .merchant-table-container {
   overflow: hidden;
   width: 100%;
   box-sizing: border-box;
   position: relative;
+}
+
+// Search and filter controls
+.table-controls {
+  display: flex;
+  gap: $spacing-std;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-std;
   
-  .table-controls {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
-    
-    .search-field {
-      flex: 2;
-      min-width: 200px;
-    }
-    
-    .category-filter {
-      flex: 1;
-      min-width: 150px;
-      
-      .mat-mdc-select-trigger {
-        display: flex;
-        align-items: center;
-      }
-      
-      .category-option {
-        display: flex;
-        align-items: center;
-        
-        .category-icon {
-          margin-right: 8px;
-          font-size: 18px;
-          height: 18px;
-          width: 18px;
-          color: #5c6bc0;
-        }
-      }
-    }
+  .search-field {
+    flex: 2;
+    min-width: 200px;
   }
-    .table-responsive {
-    overflow-x: auto;
+  
+  .category-filter {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+// Select dropdown
+.mat-mdc-select-trigger,
+.category-option {
+  display: flex;
+  align-items: center;
+}
+
+.category-icon {
+  margin-right: 8px;
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+  color: $primary-light;
+}
+
+// Responsive table
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+  
+  table {
     width: 100%;
-    
-    table {
-      width: 100%;
-      min-width: 800px; // Ensures the table doesn't shrink too much
-      
-      .merchant-name {
-        font-weight: 500;
-      }
-      
-      .action-buttons {
-        white-space: nowrap;
-      }
-      
-      .category-chip {
-        padding: 4px 8px;
-        border-radius: 16px;
-        font-size: 12px;
-        font-weight: 500;
-        display: inline-block;
-        
-        &.retail {
-          background-color: rgba(33, 150, 243, 0.1);
-          color: #1976d2;
-        }
-        
-        &.food {
-          background-color: rgba(76, 175, 80, 0.1);
-          color: #388e3c;
-        }
-        
-        &.services {
-          background-color: rgba(156, 39, 176, 0.1);
-          color: #7b1fa2;
-        }
-      }
+    min-width: 800px;
+  }
+}
+
+.merchant-name {
+  font-weight: 500;
+}
+
+.action-buttons {
+  white-space: nowrap;
+}
+
+// Category chips
+.category-chip {
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+  
+  @each $name, $colors in $category-colors {
+    &.#{$name} {
+      background-color: map-get($colors, bg);
+      color: map-get($colors, text);
     }
   }
+}
+
+// Empty state
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 0;
+  text-align: center;
   
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 48px 0;
-    text-align: center;
+  mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    margin-bottom: $spacing-std;
+    color: rgba(0, 0, 0, 0.4);
+  }
+  
+  p {
+    margin: 0 0 8px;
+    color: rgba(0, 0, 0, 0.6);
     
-    mat-icon {
-      font-size: 48px;
-      height: 48px;
-      width: 48px;
-      margin-bottom: 16px;
+    &.hint {
+      font-size: 14px;
       color: rgba(0, 0, 0, 0.4);
-    }
-    
-    p {
-      margin: 0 0 8px;
-      color: rgba(0, 0, 0, 0.6);
-      
-      &.hint {
-        font-size: 14px;
-        color: rgba(0, 0, 0, 0.4);
-      }
     }
   }
 }
@@ -167,18 +177,18 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .merchants-container {
-    padding: 16px;
+    padding: $spacing-std;
   }
   
   .header-section {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: $spacing-std;
+    margin-bottom: $spacing-std;
   }
   
   .table-responsive {
-    margin: 0 -16px;
-    width: calc(100% + 32px);
+    margin: 0 -#{$spacing-std};
+    width: calc(100% + #{$spacing-std * 2});
   }
 }
