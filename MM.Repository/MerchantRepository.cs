@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MM.Contracts.IMerchant;
 using MM.Entities;
-using MM.Entities.Filters.Composite;
 using MM.Entities.Filters.Interfaces;
 using MM.Entities.Models;
 
@@ -17,12 +16,12 @@ namespace MM.Repository
         public async Task<Merchant?> GetByIdAsync(int id) =>
             await FindByCondition(merchant => merchant.Id == id).FirstOrDefaultAsync();
 
-        public async Task<IEnumerable<Merchant>> GetFilteredAsync(CompositeFilter<Merchant> filter)
+        public async Task<IEnumerable<Merchant>> GetFilteredAsync(IFilter<Merchant> filter)
         {
             var data = await FindAll().OrderBy(merchant => merchant.Name)
                         .ToListAsync();
 
-            return filter.FilterEntities(data);
+            return [.. data.Where(filter.IsSatisfiedBy)];
         }
 
         public void CreateMerchant(Merchant merchant) => Create(merchant);
