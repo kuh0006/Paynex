@@ -142,6 +142,33 @@ namespace MM.Services.Implementations
             }
         }
 
+        public async Task<IEnumerable<MerchantReadDto>> GetByCategoryAsync(string category)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(category))
+                {
+                    _logger.LogError("Category parameter is null or empty");
+                    throw new ArgumentException("Category cannot be null or empty", nameof(category));
+                }
+
+                _logger.LogInformation("Retrieving merchants by category: {Category}", category);
+
+                IEnumerable<Merchant>? merchants = await
+                    _repository.Merchant.GetMerchantsByCategoryAsync(category);
+
+                if (!merchants.Any())
+                    _logger.LogWarning("No merchants found with category: {Category}", category);
+
+                return _mapper.Map<IEnumerable<MerchantReadDto>>(merchants);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving merchants by category: {Category}", category);
+                throw;
+            }
+        }
+
         public async Task<bool> UpdateAsync(MerchantUpdateDto merchant)
         {
             try

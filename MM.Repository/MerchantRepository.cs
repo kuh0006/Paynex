@@ -20,6 +20,11 @@ namespace MM.Repository
                     .Contains(name.ToLower()))
                         .OrderBy(m => m.Name)
                             .ToListAsync();
+                            
+        public async Task<IEnumerable<Merchant>> GetMerchantsByCategoryAsync(string category) =>
+            await FindByCondition(m => m.Category.ToLower() == category.ToLower())
+                .OrderBy(m => m.Name)
+                .ToListAsync();
 
         public void CreateMerchant(Merchant merchant) => Create(merchant);
 

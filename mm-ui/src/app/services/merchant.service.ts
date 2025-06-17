@@ -80,6 +80,26 @@ export class MerchantService {
     );
   }
 
+  searchMerchantsByCategory(category: string): Observable<Merchant[]> {
+    const route = `${this.endpoint}/category/${encodeURIComponent(category)}`;
+
+    return this.crudService.getAllWrapped<Merchant>(route).pipe(
+      map((response: ApiResponse<Merchant[]>) => {
+        if (response && response.success) {
+          return response.data || [];
+        }
+        return [];
+      }),
+      catchError((error: any) => {
+        console.error(
+          `${this.logPrefix} Error searching merchants by category "${category}":`,
+          error
+        );
+        return of([]);
+      })
+    );
+  }
+
   //#region Private Helper Methods
   private extractDataFromResponse = <T>(response: ApiResponse<T>): T => {
     if (response && response.success) return response.data;

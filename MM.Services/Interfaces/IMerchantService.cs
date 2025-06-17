@@ -6,6 +6,7 @@ namespace MM.Services.Interfaces
     {
         Task<MerchantReadDto?> GetByIdAsync(int id);
         Task<IEnumerable<MerchantReadDto>> GetByNameAsync(string name);
+        Task<IEnumerable<MerchantReadDto>> GetByCategoryAsync(string category);
         Task<IEnumerable<MerchantReadDto>> GetAllAsync();
 
         Task<int> CreateAsync(MerchantCreateDto merchant);

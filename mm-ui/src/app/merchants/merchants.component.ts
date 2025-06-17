@@ -47,7 +47,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
     private merchantService: MerchantService,
     private dialog: MatDialog
   ) {}
-
   ngOnInit(): void {
     this.loadMerchants();
 
@@ -57,6 +56,16 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       .subscribe((value) => {
         if (value) {
           this.searchMerchants(value);
+        } else {
+          this.loadMerchants();
+        }
+      });
+      
+    // Set up category filter
+    this.categoryFilter.valueChanges
+      .subscribe((value) => {
+        if (value) {
+          this.filterByCategory(value);
         } else {
           this.loadMerchants();
         }
@@ -107,6 +116,28 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
         error: (error) => {
           console.error('Error searching merchants:', error);
           this.error = 'Failed to search merchants. Please try again.';
+        },
+      });
+  }
+  
+  /**
+   * Filters merchants by category
+   */
+  filterByCategory(category: string): void {
+    this.isLoading = true;
+    this.error = null;
+    
+    this.merchantService
+      .searchMerchantsByCategory(category)
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: (merchants) => {
+          this.dataSource.data = merchants;
+          console.log('Category filter results:', merchants.length);
+        },
+        error: (error) => {
+          console.error('Error filtering merchants by category:', error);
+          this.error = 'Failed to filter merchants. Please try again.';
         },
       });
   }

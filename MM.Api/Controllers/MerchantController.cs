@@ -75,6 +75,29 @@ namespace MM.Api.Controllers
             return Ok(ApiResponse<IEnumerable<MerchantReadDto>>.SuccessResponse(merchants, "Merchants retrieved successfully."));
         }
 
+        [HttpGet("category/{category}")]
+        public async Task<IActionResult> GetMerchantsByCategory(string category)
+        {
+            _logger.LogInformation("GetMerchantsByCategory called for Category: {Category}", category);
+
+            if (string.IsNullOrWhiteSpace(category))
+            {
+                _logger.LogError("Category parameter is null or empty");
+                return BadRequest(ApiResponse<MerchantReadDto>.FailResponse("Category parameter cannot be null or empty."));
+            }
+
+            IEnumerable<MerchantReadDto> merchants = await _merchantService.GetByCategoryAsync(category);
+
+            if (merchants == null || !merchants.Any())
+            {
+                _logger.LogInformation("No merchants found with category: {Category}", category);
+                return NotFound(ApiResponse<MerchantReadDto>.NotFound("No merchants found with the specified category."));
+            }
+
+            _logger.LogInformation("Retrieved {Count} merchants with category: {Category}", merchants.Count(), category);
+            return Ok(ApiResponse<IEnumerable<MerchantReadDto>>.SuccessResponse(merchants, "Merchants retrieved successfully."));
+        }
+
         // Create a new merchant
         [HttpPost]
         public async Task<IActionResult> CreateMerchant([FromBody] MerchantCreateDto merchantCreate)

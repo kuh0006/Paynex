@@ -71,6 +71,24 @@
     .category-filter {
       flex: 1;
       min-width: 150px;
+      
+      .mat-mdc-select-trigger {
+        display: flex;
+        align-items: center;
+      }
+      
+      .category-option {
+        display: flex;
+        align-items: center;
+        
+        .category-icon {
+          margin-right: 8px;
+          font-size: 18px;
+          height: 18px;
+          width: 18px;
+          color: #5c6bc0;
+        }
+      }
     }
   }
   
