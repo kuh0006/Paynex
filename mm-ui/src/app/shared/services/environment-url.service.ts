@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EnvironmentUrlService {
-  /*
-   * This is the base url of the API
+  /**
+   * The base URL of the API
    */
-  public urlAddress: string = 'https://localhost:7111/';
+  public get urlAddress(): string {
+    return environment.apiUrl;
+  }
 }

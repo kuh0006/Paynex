@@ -18,7 +18,7 @@ export class UtilityService {
    * @returns The complete route formed by combining the base URL and the provided route.
    * @throws Error if the URL address or route is not defined or empty.
    */
-  createCompleteRoute = (route: string) => {
+  createCompleteRoute(route: string): string {
     // If the URL address is not defined or empty, throw an error
     if (!this._env.urlAddress || this._env.urlAddress.trim() === '') {
       throw new Error('URL address is not defined or empty.');
@@ -38,5 +38,5 @@ export class UtilityService {
     const formattedRoute = route.startsWith('/') ? route.slice(1) : route;
 
     return `${baseUrl}/api/${formattedRoute}`;
-  };
+  }
 }
