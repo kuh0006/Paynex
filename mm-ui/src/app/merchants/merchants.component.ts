@@ -41,27 +41,20 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
   error: string | null = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-  constructor(
-    private merchantService: MerchantService,
-    private dialog: MatDialog
-  ) {}
+  
+  constructor(private merchantService: MerchantService, private dialog: MatDialog) {}
   
   ngOnInit(): void {
     this.loadMerchants();
 
-    // Set up combined search/filter functionality
     this.setupCombinedFilter();
   }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
   }
 
-  /**
-   * Loads all merchants from the API
-   */
+  
   loadMerchants(): void {
     this.isLoading = true;
     this.error = null;
@@ -80,9 +73,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
       });
   }
 
-  /**
-   * Sets up combined filtering by name and category
-   */
+  
   setupCombinedFilter(): void {
     // Set up search with debounce
     this.searchControl.valueChanges
@@ -152,9 +143,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
     }
   }
   
-  /**
-   * Opens dialog to add a new merchant
-   */
+
   openAddMerchantDialog(): void {
     const dialogRef = this.dialog.open(MerchantDialogComponent, {
       width: '400px',
@@ -171,7 +160,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
             next: () => {
               this.loadMerchants();
               console.log('Merchant created successfully');
-              // We could add a snackbar notification here
             },
             error: (error) => {
               console.error('Error creating merchant:', error);
@@ -182,9 +170,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  /**
-   * Opens dialog to edit a merchant
-   */
   openEditMerchantDialog(merchant: Merchant): void {
     const dialogRef = this.dialog.open(MerchantDialogComponent, {
       width: '400px',
@@ -201,7 +186,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
             next: () => {
               this.loadMerchants();
               console.log('Merchant updated successfully');
-              // We could add a snackbar notification here
             },
             error: (error) => {
               console.error('Error updating merchant:', error);
