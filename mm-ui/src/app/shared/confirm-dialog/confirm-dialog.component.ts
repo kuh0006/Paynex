@@ -111,31 +111,6 @@ export interface ConfirmDialogData {
       width: 18px;
       height: 18px;
     }
-    
-    /* Responsive design */
-    @media (max-width: 600px) {
-      .dialog-container {
-        padding: 4px;
-      }
-      
-      mat-dialog-content {
-        padding: 0 20px 16px 20px;
-      }
-      
-      .warning-icon {
-        font-size: 24px;
-        width: 24px;
-        height: 24px;
-      }
-      
-      h2[mat-dialog-title] {
-        font-size: 18px;
-      }
-      
-      .dialog-message {
-        font-size: 14px;
-      }
-    }
   `]
 })
 export class ConfirmDialogComponent {

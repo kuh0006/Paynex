@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
@@ -54,7 +53,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
   
   ngOnInit(): void {
     this.loadMerchants();
-
     this.setupCombinedFilter();
   }
 
@@ -66,22 +64,21 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
   
   loadMerchants(): void {
     this.isLoading = true;
-    this.error = null;    this.merchantService.getAllMerchants()
+    this.error = null;    
+    
+    this.merchantService.getAllMerchants()
       .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe({
-        next: (merchants) => {
-          this.dataSource.data = merchants;
-          // Remove console.log for production, could add if needed: 
-          // this.snackBar.open(`Loaded ${merchants.length} merchants`, 'Close', { duration: 2000 });
-        },
-        error: (error) => {
-          console.error('Error loading merchants:', error);
-          this.error = 'Failed to load merchants. Please try again.';
-        },
+        .subscribe({
+          next: (merchants) => {
+            this.dataSource.data = merchants;
+          },
+          error: (error) => {
+            console.error('Error loading merchants:', error);
+            this.error = 'Failed to load merchants. Please try again.';
+          },
       });
   }
 
@@ -154,9 +151,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-  /**
-   * Deletes a merchant
-   */
+  
   private deleteMerchant(id: number): void {
     this.isLoading = true;
     this.merchantService
