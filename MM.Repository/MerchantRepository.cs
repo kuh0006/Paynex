@@ -2,7 +2,6 @@
 using MM.Contracts.IMerchant;
 using MM.Entities;
 using MM.Entities.Filters.Composite;
-using MM.Entities.Filters.Interfaces;
 using MM.Entities.Models;
 
 namespace MM.Repository
