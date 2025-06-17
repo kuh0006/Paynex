@@ -12,28 +12,18 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 })
 export class App implements OnInit {
   protected title = 'mm-ui';
-  protected sidenavOpened = true;
   protected isSmallScreen = false;
   
   constructor(private breakpointObserver: BreakpointObserver) {}
   
   ngOnInit() {
-    // Monitor screen size changes
+    // Monitor screen size changes for responsive adjustments
     this.breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
     ]).subscribe(result => {
       this.isSmallScreen = result.matches;
-      // Auto close sidenav on small screens
-      if (this.isSmallScreen) {
-        this.sidenavOpened = false;
-      } else {
-        this.sidenavOpened = true;
-      }
+      // No need to adjust sidebar - we'll use only top navigation
     });
-  }
-  
-  toggleSidenav() {
-    this.sidenavOpened = !this.sidenavOpened;
   }
 }
