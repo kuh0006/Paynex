@@ -95,16 +95,16 @@ namespace MM.Api.Controllers
             }
 
             // Create the merchant
-            int merchantID = await _merchantService.CreateAsync(merchantCreate);
+            var merchant = await _merchantService.CreateAsync(merchantCreate);
 
-            if (merchantID <= 0)
+            if (merchant == null)
             {
                 _logger.LogError("Failed to create merchant");
-                return BadRequest(ApiResponse<bool>.FailResponse("Merchant creation failed."));
+                return BadRequest(ApiResponse<Merchant>.FailResponse("Merchant creation failed."));
             }
 
-            _logger.LogInformation("Merchant created successfully with ID: {Id}", merchantID);
-            return CreatedAtAction(nameof(GetMerchantById), new { id = merchantID }, ApiResponse<int>.SuccessResponse(merchantID, "Merchant created successfully."));
+            _logger.LogInformation("Merchant created successfully with ID: {Id}", merchant.Id);
+            return CreatedAtAction(nameof(GetMerchantById), new { id = merchant.Id }, ApiResponse<Merchant>.SuccessResponse(merchant, "Merchant created successfully."));
         }
 
         [HttpPut("{id}")]

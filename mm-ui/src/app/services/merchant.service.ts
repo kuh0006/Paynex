@@ -28,14 +28,14 @@ export class MerchantService {
     );
   }
 
-  createMerchant(merchant: Merchant): Observable<boolean> {
+  createMerchant(merchant: Merchant): Observable<Merchant> {
     return this.crudService
-      .createWrapped<Merchant, boolean>(this.endpoint, merchant)
+      .createWrapped<Merchant, Merchant>(this.endpoint, merchant)
       .pipe(
-        map((response: ApiResponse<boolean>) =>
-          this.extractDataFromResponse<boolean>(response)
+        map((response: ApiResponse<Merchant>) =>
+          this.extractDataFromResponse<Merchant>(response)
         ),
-        catchError(this.handleError<boolean>(`createMerchant: ${merchant.name}`))
+        catchError(this.handleError<Merchant>(`createMerchant: ${merchant.name}`))
       );
   }
 

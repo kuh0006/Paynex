@@ -1,11 +1,24 @@
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { debounceTime, distinctUntilChanged, takeUntil, startWith, map, switchMap, finalize } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  takeUntil,
+  startWith,
+  map,
+  finalize,
+} from 'rxjs/operators';
 import { Subject, BehaviorSubject, Observable, combineLatest } from 'rxjs';
 
 import { Merchant, MERCHANT_CATEGORIES } from '../models/merchant.model';
@@ -39,21 +52,20 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
   categoryFilter = new FormControl('');
   isLoading = false;
   error: string | null = null;
-  
+
   private destroy$ = new Subject<void>();
-  
-  // Observable approach 
+
+  // Observable approach
   private merchants$ = new BehaviorSubject<Merchant[]>([]);
   private filteredMerchants$: Observable<Merchant[]>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  
+
   constructor(
-    private merchantService: MerchantService, 
+    private merchantService: MerchantService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {
-
     // Reactive filtering
     this.filteredMerchants$ = combineLatest([
       this.merchants$.asObservable(),
@@ -65,14 +77,18 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.categoryFilter.valueChanges.pipe(
         startWith(''),
         distinctUntilChanged()
-      )
+      ),
     ]).pipe(
       map(([merchants, searchTerm, category]) => {
-        return this.filterMerchantsLocally(merchants, searchTerm || '', category || '');
+        return this.filterMerchantsLocally(
+          merchants,
+          searchTerm || '',
+          category || ''
+        );
       })
     );
   }
-  
+
   ngOnInit(): void {
     this.loadMerchants();
     this.setupObservableSubscription();
@@ -86,19 +102,20 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-  
+
   loadMerchants(): void {
     this.isLoading = true;
-    this.error = null;    
-    
-    this.merchantService.getAllMerchants()
+    this.error = null;
+
+    this.merchantService
+      .getAllMerchants()
       .pipe(
         finalize(() => (this.isLoading = false)),
         takeUntil(this.destroy$)
       )
       .subscribe({
         next: (merchants) => {
-          this.merchants$.next(merchants); // 
+          this.merchants$.next(merchants); //
         },
         error: (error) => {
           console.error('Error loading merchants:', error);
@@ -106,53 +123,58 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
         },
       });
   }
-  
+
   private setupObservableSubscription(): void {
     this.filteredMerchants$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(filteredMerchants => {
+      .subscribe((filteredMerchants) => {
         this.dataSource.data = filteredMerchants;
       });
   }
-  
-  private filterMerchantsLocally(merchants: Merchant[], searchTerm: string, category: string): Merchant[] {
-    return merchants.filter(merchant => {
-      const matchesSearch = !searchTerm || 
+
+  private filterMerchantsLocally(
+    merchants: Merchant[],
+    searchTerm: string,
+    category: string
+  ): Merchant[] {
+    return merchants.filter((merchant) => {
+      const matchesSearch =
+        !searchTerm ||
         merchant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         merchant.email.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       const matchesCategory = !category || merchant.category === category;
-      
+
       return matchesSearch && matchesCategory;
     });
   }
-  
+
   private updateLocalMerchant(updatedMerchant: Merchant): void {
     const currentMerchants = this.merchants$.value;
-    const index = currentMerchants.findIndex(m => m.id === updatedMerchant.id);
-    
+    const index = currentMerchants.findIndex(
+      (m) => m.id === updatedMerchant.id
+    );
+
     if (index >= 0) {
       currentMerchants[index] = updatedMerchant;
       this.merchants$.next([...currentMerchants]);
     }
   }
-    private addLocalMerchant(newMerchant: Merchant): void {
+  private addLocalMerchant(newMerchant: Merchant): void {
     const currentMerchants = this.merchants$.value;
-    // Ak nový merchant nemá ID, vygenerujeme dočasné
-    if (!newMerchant.id) {
-      const maxId = Math.max(...currentMerchants.map(m => m.id || 0));
-      newMerchant.id = maxId + 1;
-    }
     this.merchants$.next([...currentMerchants, newMerchant]);
   }
-  
+
   private removeLocalMerchant(merchantId: number): void {
     const currentMerchants = this.merchants$.value;
-    const filteredMerchants = currentMerchants.filter(m => m.id !== merchantId);
+    const filteredMerchants = currentMerchants.filter(
+      (m) => m.id !== merchantId
+    );
     this.merchants$.next(filteredMerchants);
   }
-  
-  confirmDelete(merchant: Merchant): void {    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+
+  confirmDelete(merchant: Merchant): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '450px',
       maxWidth: '90vw',
       disableClose: true,
@@ -161,17 +183,17 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
         title: 'Delete Merchant',
         message: `Are you sure you want to permanently delete "${merchant.name}"? This action cannot be undone.`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
-      }
+        cancelText: 'Cancel',
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.deleteMerchant(merchant.id!);
       }
     });
   }
-    private deleteMerchant(id: number): void {
+  private deleteMerchant(id: number): void {
     this.isLoading = true;
     this.merchantService
       .deleteMerchant(id)
@@ -183,7 +205,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
         next: () => {
           this.removeLocalMerchant(id); // ✅ Aktualizuje lokálne dáta
           this.snackBar.open('Merchant deleted successfully', 'Close', {
-            duration: 3000
+            duration: 3000,
           });
         },
         error: (error) => {
@@ -192,7 +214,6 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
         },
       });
   }
-  
 
   openAddMerchantDialog(): void {
     const dialogRef = this.dialog.open(MerchantDialogComponent, {
@@ -202,17 +223,18 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.isLoading = true;        this.merchantService
+        this.isLoading = true;
+        this.merchantService
           .createMerchant(result)
           .pipe(
             finalize(() => (this.isLoading = false)),
             takeUntil(this.destroy$)
           )
-          .subscribe({            next: () => {
-              // Pridáme result (nový merchant) do lokálnych dát
-              this.addLocalMerchant(result);
+          .subscribe({
+            next: (createdMerchant) => {
+              this.addLocalMerchant(createdMerchant);
               this.snackBar.open('Merchant created successfully', 'Close', {
-                duration: 3000
+                duration: 3000,
               });
             },
             error: (error) => {
@@ -232,7 +254,8 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.isLoading = true;        this.merchantService
+        this.isLoading = true;
+        this.merchantService
           .updateMerchant(merchant.id as number, result)
           .pipe(
             finalize(() => (this.isLoading = false)),
@@ -240,11 +263,10 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
           )
           .subscribe({
             next: () => {
-              // Aktualizujeme lokálne dáta s novými hodnotami
-              const updatedMerchant = { ...merchant, ...result };
-              this.updateLocalMerchant(updatedMerchant);
+              const merchantToUpdate = { ...merchant, ...result };
+              this.updateLocalMerchant(merchantToUpdate);
               this.snackBar.open('Merchant updated successfully', 'Close', {
-                duration: 3000
+                duration: 3000,
               });
             },
             error: (error) => {

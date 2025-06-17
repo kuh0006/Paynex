@@ -10,7 +10,7 @@ namespace MM.Services.Interfaces
         Task<IEnumerable<MerchantReadDto>> GetAllAsync();
         Task<IEnumerable<MerchantReadDto>> GetFilteredAsync(CompositeFilter<Merchant> filter);
 
-        Task<int> CreateAsync(MerchantCreateDto merchant);
+        Task<Merchant> CreateAsync(MerchantCreateDto merchant);
         Task<bool> UpdateAsync(MerchantUpdateDto merchant);
         Task<bool> DeleteAsync(int id);
     }
