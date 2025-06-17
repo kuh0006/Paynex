@@ -7,8 +7,8 @@ import { Merchant, ApiResponse } from '../models/merchant.model';
   providedIn: 'root',
 })
 export class MerchantService {
-  private endpoint = 'merchant';
-  private logPrefix = '[MerchantService]';
+  private readonly endpoint = 'merchant';
+  private readonly logPrefix = '[MerchantService]';
 
   constructor(private crudService: CrudService) {}
 
@@ -35,7 +35,7 @@ export class MerchantService {
         map((response: ApiResponse<boolean>) =>
           this.extractDataFromResponse<boolean>(response)
         ),
-        catchError(this.handleError<boolean>(`createMerchant (${merchant})`))
+        catchError(this.handleError<boolean>(`createMerchant: ${merchant.name}`))
       );
   }
 
@@ -67,15 +67,15 @@ export class MerchantService {
     };
 
     return this.crudService
-      .createWrapped<any, Merchant[]>(`${this.endpoint}/filter`, filterDto)
+      .createWrapped<{name: string, category: string}, Merchant[]>(`${this.endpoint}/filter`, filterDto)
       .pipe(
         map((response: ApiResponse<Merchant[]>) => {
-          if (response && response.success) {
+          if (response && response.success) 
             return response.data || [];
-          }
+          
           return [];
         }),
-        catchError((error: any) => {
+        catchError((error: unknown) => {
           console.error(
             `${this.logPrefix} Error filtering merchants:`,
             error
@@ -86,20 +86,33 @@ export class MerchantService {
   }
 
   //#region Private Helper Methods
-  private extractDataFromResponse = <T>(response: ApiResponse<T>): T => {
-    if (response && response.success) return response.data;
-
+  private extractDataFromResponse<T>(response: ApiResponse<T>): T {
+    if (response && response.success) 
+      return response.data;
+    
     throw new Error(response?.message || 'API request failed');
-  };
+  }
 
-  private handleError = <T>(operation: string, fallbackValue?: T) => {
-    return (error: any): Observable<T> => {
+  private handleError<T>(operation: string, fallbackValue?: T) {
+    return (error: unknown): Observable<T> => {
       console.error(`${this.logPrefix} ${operation} failed:`, error);
-
-      if (fallbackValue !== undefined) return of(fallbackValue);
+      
+      // Generate a user-friendly error message
+      let errorMessage = 'An unknown error occurred';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      // Log detailed error for debugging
+      console.error(`${errorMessage} (${operation})`);
+      
+      // Return fallback value if provided, otherwise re-throw
+      if (fallbackValue !== undefined) {
+        return of(fallbackValue);
+      }
 
       throw error;
     };
-  };
+  }
   //#endregion
 }
