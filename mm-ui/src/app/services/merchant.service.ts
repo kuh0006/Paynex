@@ -76,10 +76,10 @@ export class MerchantService {
           return [];
         }),
         catchError((error: unknown) => {
-          console.error(
-            `${this.logPrefix} Error filtering merchants:`,
-            error
-          );
+          // console.error(
+          //   `${this.logPrefix} Error filtering merchants:`,
+          //   error
+          // );
           return of([]);
         })
       );
@@ -95,7 +95,7 @@ export class MerchantService {
 
   private handleError<T>(operation: string, fallbackValue?: T) {
     return (error: unknown): Observable<T> => {
-      console.error(`${this.logPrefix} ${operation} failed:`, error);
+      // console.error(`${this.logPrefix} ${operation} failed:`, error);
       
       // Generate a user-friendly error message
       let errorMessage = 'An unknown error occurred';
@@ -104,7 +104,7 @@ export class MerchantService {
       }
       
       // Log detailed error for debugging
-      console.error(`${errorMessage} (${operation})`);
+      // console.error(`${errorMessage} (${operation})`);
       
       // Return fallback value if provided, otherwise re-throw
       if (fallbackValue !== undefined) {

@@ -72,7 +72,7 @@ export class CrudService {
   ): Observable<ApiResponse<boolean>> {
     return this.makeWrappedRequest<boolean>('DELETE', `${route}/${id}`);
   }
-  
+
   // ===== PRIVATE HELPER METHODS =====
   private handleError(
     operation: string,
@@ -84,7 +84,7 @@ export class CrudService {
         : `${this.logPrefix} ${operation} failed:`;
       
       // Log the error
-      console.error(message, error);
+      // console.error(message, error);
       
       // Extract a user-friendly error message if available
       let errorMessage = 'An unknown error occurred';

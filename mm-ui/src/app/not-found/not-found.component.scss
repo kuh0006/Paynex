@@ -20,14 +20,16 @@
   justify-content: center;
 }
 
-.error-image-container {
+.error-icon-container {
   display: flex;
   justify-content: center;
-  margin: 20px 0;
+  margin: 30px 0;
   
-  .error-image {
-    max-width: 300px;
-    width: 100%;
+  .large-error-icon {
+    font-size: 100px;
+    height: 100px;
+    width: 100px;
+    opacity: 0.8;
   }
 }
 

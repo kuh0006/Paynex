@@ -1,32 +1,47 @@
+// Variables for consistent values
+$primary-color: #3f51b5;
+$text-color-secondary: rgba(0, 0, 0, 0.6);
+$spacing-lg: 30px;
+$spacing-md: 20px;
+$spacing-sm: 10px;
+
+// Container with standard max-width
 .home-container {
-  padding: 20px;
+  padding: $spacing-md;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.welcome-section {
+// Text alignment helpers
+.text-center {
   text-align: center;
+}
+
+// Welcome section
+.welcome-section {
+  @extend .text-center;
   padding: 40px 0;
   
   h1 {
     font-size: 2.5rem;
-    margin-bottom: 10px;
-    color: #3f51b5;
+    margin-bottom: $spacing-sm;
+    color: $primary-color;
   }
   
   .subtitle {
     font-size: 1.2rem;
-    color: rgba(0, 0, 0, 0.6);
-    margin-bottom: 30px;
+    color: $text-color-secondary;
+    margin-bottom: $spacing-lg;
   }
 }
 
+// Button styles
 .action-buttons {
-  margin: 30px 0;
+  margin: $spacing-lg 0;
   
   button {
-    margin: 0 10px;
-    padding: 10px 20px;
+    margin: 0 $spacing-sm;
+    padding: $spacing-sm $spacing-md;
     
     mat-icon {
       margin-right: 8px;
@@ -34,16 +49,13 @@
   }
 }
 
+// Media queries
 @media (max-width: 768px) {
   .welcome-section {
-    padding: 20px 0;
+    padding: $spacing-md 0;
     
     h1 {
       font-size: 2rem;
     }
-  }
-  
-  .feature-cards {
-    grid-template-columns: 1fr;
   }
 }
