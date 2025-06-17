@@ -22,5 +22,7 @@ namespace MM.Entities.Models
         public string Category { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public bool IsDeleted { get; set; } = false;
     }
 }
