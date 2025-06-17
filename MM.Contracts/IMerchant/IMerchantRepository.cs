@@ -1,4 +1,5 @@
-﻿using MM.Entities.Models;
+﻿using MM.Entities.Filters.Composite;
+using MM.Entities.Models;
 
 namespace MM.Contracts.IMerchant
 {
@@ -8,6 +9,7 @@ namespace MM.Contracts.IMerchant
         Task<Merchant?> GetByIdAsync(int id);
         Task<IEnumerable<Merchant>> GetMerchantsByNameAsync(string name);
         Task<IEnumerable<Merchant>> GetMerchantsByCategoryAsync(string category);
+        Task<IEnumerable<Merchant>> GetFilteredAsync(CompositeFilter<Merchant> filter);
 
         void CreateMerchant(Merchant merchant);
         void UpdateMerchant(Merchant merchant);

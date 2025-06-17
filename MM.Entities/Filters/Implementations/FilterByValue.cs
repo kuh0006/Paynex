@@ -1,4 +1,6 @@
-﻿namespace MM.Entities.Filters.Base
+﻿using MM.Entities.Filters.Base;
+
+namespace MM.Entities.Filters.Implementations
 {
     /// <summary>
     /// Represents a filter that filters entities based on a specific value.

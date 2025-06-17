@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MM.Entities.DTOs.Merchant;
+using MM.Entities.Filters.Composite;
+using MM.Entities.Filters.CriterionMerchant;
+using MM.Entities.Filters.FilterMerchant;
+using MM.Entities.Models;
 using MM.Services.Common;
+using MM.Services.DTOs.Merchant;
 using MM.Services.Interfaces;
 
 namespace MM.Api.Controllers
@@ -96,6 +101,32 @@ namespace MM.Api.Controllers
 
             _logger.LogInformation("Retrieved {Count} merchants with category: {Category}", merchants.Count(), category);
             return Ok(ApiResponse<IEnumerable<MerchantReadDto>>.SuccessResponse(merchants, "Merchants retrieved successfully."));
+        }
+
+        [HttpPost("filter")]
+        public async Task<IActionResult> GetFilteredMerchants([FromBody] MerchantFilterDto filterDto)
+        {
+            _logger.LogInformation("Filtering merchants by name: {Name}, category: {Category}", filterDto.Name, filterDto.Category);
+
+            CompositeFilter<Merchant> filter = new();
+
+            if (!string.IsNullOrWhiteSpace(filterDto.Name))
+                filter.AddFilter(new FilterMerchantNameContains(new MerchantNameCriterion(), filterDto.Name));
+
+            if (!string.IsNullOrWhiteSpace(filterDto.Category))
+                filter.AddFilter(new FilterMerchantCategory(new MerchantCategoryCriterion(), filterDto.Category));
+
+            IEnumerable<MerchantReadDto> result = await _merchantService.GetFilteredAsync(filter);
+
+
+            if (result == null || !result.Any())
+            {
+                _logger.LogInformation("No merchants found matching the filter criteria");
+                return NotFound(ApiResponse<IEnumerable<MerchantReadDto>>.NotFound("No matching merchants found."));
+            }
+
+            _logger.LogInformation("Filtered merchants retrieved successfully, count: {Count}", result.Count());
+            return Ok(ApiResponse<IEnumerable<MerchantReadDto>>.SuccessResponse(result, "Filtered merchants retrieved successfully."));
         }
 
         // Create a new merchant

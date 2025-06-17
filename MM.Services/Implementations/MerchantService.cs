@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using MM.Contracts;
 using MM.Entities.DTOs.Merchant;
+using MM.Entities.Filters.Composite;
+using MM.Entities.Filters.Interfaces;
 using MM.Entities.Models;
 using MM.Services.Interfaces;
 
@@ -165,6 +167,32 @@ namespace MM.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving merchants by category: {Category}", category);
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<MerchantReadDto>> GetFilteredAsync(CompositeFilter<Merchant> filter)
+        {
+            try
+            {
+                if (filter == null)
+                {
+                    _logger.LogError("Filter object is null");
+                    throw new ArgumentNullException(nameof(filter), "Filter cannot be null");
+                }
+
+                _logger.LogInformation("Retrieving merchants with filter: {Filter}", filter);
+
+                IEnumerable<Merchant> merchants = await _repository.Merchant.GetFilteredAsync(filter);
+
+                if (!merchants.Any())
+                    _logger.LogWarning("No merchants found with the specified filter");
+
+                return _mapper.Map<IEnumerable<MerchantReadDto>>(merchants);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while filtering merchants");
                 throw;
             }
         }

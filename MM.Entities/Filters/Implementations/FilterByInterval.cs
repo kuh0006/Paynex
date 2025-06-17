@@ -1,4 +1,6 @@
-﻿namespace MM.Entities.Filters.Base
+﻿using MM.Entities.Filters.Base;
+
+namespace MM.Entities.Filters.Implementations
 {
     /// <summary>
     /// Represents a filter that checks if a criterion value falls within a specified interval.

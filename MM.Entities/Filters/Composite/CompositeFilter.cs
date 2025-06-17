@@ -1,6 +1,6 @@
 ﻿using MM.Entities.Filters.Interfaces;
 
-namespace MM.Entities.Filters.Base
+namespace MM.Entities.Filters.Composite
 {
     /// <summary>
     /// Represents a composite filter that combines multiple filters to filter entities of type T.
@@ -9,6 +9,7 @@ namespace MM.Entities.Filters.Base
     public class CompositeFilter<T> : IFilter<T> where T : class
     {
         private List<IFilter<T>> _filters { get; set; } = [];
+        public int Count => _filters.Count;
 
         /// <summary>
         /// Determines whether the specified entity satisfies all the filters in the composite filter.
@@ -48,10 +49,8 @@ namespace MM.Entities.Filters.Base
             List<T> filteredEntities = [];
 
             foreach (var entity in entities)
-            {
                 if (IsSatisfiedBy(entity))
                     filteredEntities.Add(entity);
-            }
 
             return filteredEntities;
         }

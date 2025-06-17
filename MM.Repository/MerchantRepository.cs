@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MM.Contracts.IMerchant;
 using MM.Entities;
+using MM.Entities.Filters.Composite;
+using MM.Entities.Filters.Interfaces;
 using MM.Entities.Models;
 
 namespace MM.Repository
@@ -20,11 +22,19 @@ namespace MM.Repository
                     .Contains(name.ToLower()))
                         .OrderBy(m => m.Name)
                             .ToListAsync();
-                            
+
         public async Task<IEnumerable<Merchant>> GetMerchantsByCategoryAsync(string category) =>
             await FindByCondition(m => m.Category.ToLower() == category.ToLower())
                 .OrderBy(m => m.Name)
                 .ToListAsync();
+
+        public async Task<IEnumerable<Merchant>> GetFilteredAsync(CompositeFilter<Merchant> filter)
+        {
+            var data = await FindAll().OrderBy(merchant => merchant.Name)
+                        .ToListAsync();
+
+            return filter.FilterEntities(data);
+        }
 
         public void CreateMerchant(Merchant merchant) => Create(merchant);
 

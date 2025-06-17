@@ -8,6 +8,9 @@ namespace MM.Entities.Validators
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
+            if (value is null || string.IsNullOrWhiteSpace(value.ToString()))
+                return ValidationResult.Success;
+
             if (value is string str && Allowed.Any(a => string.Equals(a, str, StringComparison.OrdinalIgnoreCase)))
                 return ValidationResult.Success;
 
