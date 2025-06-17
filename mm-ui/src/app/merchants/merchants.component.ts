@@ -46,30 +46,11 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
   constructor(
     private merchantService: MerchantService,
     private dialog: MatDialog
-  ) {}
-  ngOnInit(): void {
+  ) {}  ngOnInit(): void {
     this.loadMerchants();
 
-    // Set up search with debounce
-    this.searchControl.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe((value) => {
-        if (value) {
-          this.searchMerchants(value);
-        } else {
-          this.loadMerchants();
-        }
-      });
-      
-    // Set up category filter
-    this.categoryFilter.valueChanges
-      .subscribe((value) => {
-        if (value) {
-          this.filterByCategory(value);
-        } else {
-          this.loadMerchants();
-        }
-      });
+    // Set up combined search/filter functionality
+    this.setupCombinedFilter();
   }
 
   ngAfterViewInit(): void {
@@ -97,46 +78,50 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
         },
       });
   }
-
   /**
-   * Searches merchants by name
+   * Sets up combined filtering by name and category
    */
-  searchMerchants(name: string): void {
-    this.isLoading = true;
-    this.error = null;
-
-    this.merchantService
-      .searchMerchantsByName(name)
-      .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe({
-        next: (merchants) => {
-          this.dataSource.data = merchants;
-          console.log('Search results:', merchants.length);
-        },
-        error: (error) => {
-          console.error('Error searching merchants:', error);
-          this.error = 'Failed to search merchants. Please try again.';
-        },
+  setupCombinedFilter(): void {
+    // Set up search with debounce
+    this.searchControl.valueChanges
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe(() => {
+        this.applyFilters();
+      });
+      
+    // Set up category filter
+    this.categoryFilter.valueChanges
+      .subscribe(() => {
+        this.applyFilters();
       });
   }
   
   /**
-   * Filters merchants by category
+   * Applies both name and category filters simultaneously
    */
-  filterByCategory(category: string): void {
+  applyFilters(): void {
+    const name = this.searchControl.value || '';
+    const category = this.categoryFilter.value || '';
+    
+    // If both filters are empty, load all merchants
+    if (!name && !category) {
+      this.loadMerchants();
+      return;
+    }
+    
     this.isLoading = true;
     this.error = null;
     
     this.merchantService
-      .searchMerchantsByCategory(category)
+      .filterByAsync(name, category)
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: (merchants) => {
           this.dataSource.data = merchants;
-          console.log('Category filter results:', merchants.length);
+          console.log('Combined filter results:', merchants.length);
         },
         error: (error) => {
-          console.error('Error filtering merchants by category:', error);
+          console.error('Error filtering merchants:', error);
           this.error = 'Failed to filter merchants. Please try again.';
         },
       });

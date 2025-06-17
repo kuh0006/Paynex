@@ -17,17 +17,6 @@ namespace MM.Repository
         public async Task<Merchant?> GetByIdAsync(int id) =>
             await FindByCondition(merchant => merchant.Id == id).FirstOrDefaultAsync();
 
-        public async Task<IEnumerable<Merchant>> GetMerchantsByNameAsync(string name) =>
-            await FindByCondition(m => m.Name.ToLower()
-                    .Contains(name.ToLower()))
-                        .OrderBy(m => m.Name)
-                            .ToListAsync();
-
-        public async Task<IEnumerable<Merchant>> GetMerchantsByCategoryAsync(string category) =>
-            await FindByCondition(m => m.Category.ToLower() == category.ToLower())
-                .OrderBy(m => m.Name)
-                .ToListAsync();
-
         public async Task<IEnumerable<Merchant>> GetFilteredAsync(CompositeFilter<Merchant> filter)
         {
             var data = await FindAll().OrderBy(merchant => merchant.Name)

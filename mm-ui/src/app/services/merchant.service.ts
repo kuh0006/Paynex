@@ -60,44 +60,29 @@ export class MerchantService {
     );
   }
 
-  searchMerchantsByName(name: string): Observable<Merchant[]> {
-    const route = `${this.endpoint}/name/${encodeURIComponent(name)}`;
+  filterByAsync(name?: string, category?: string): Observable<Merchant[]> {
+    const filterDto = {
+      name: name || '',
+      category: category || '',
+    };
 
-    return this.crudService.getAllWrapped<Merchant>(route).pipe(
-      map((response: ApiResponse<Merchant[]>) => {
-        if (response && response.success) {
-          return response.data || [];
-        }
-        return [];
-      }),
-      catchError((error: any) => {
-        console.error(
-          `${this.logPrefix} Error searching merchants by name "${name}":`,
-          error
-        );
-        return of([]);
-      })
-    );
-  }
-
-  searchMerchantsByCategory(category: string): Observable<Merchant[]> {
-    const route = `${this.endpoint}/category/${encodeURIComponent(category)}`;
-
-    return this.crudService.getAllWrapped<Merchant>(route).pipe(
-      map((response: ApiResponse<Merchant[]>) => {
-        if (response && response.success) {
-          return response.data || [];
-        }
-        return [];
-      }),
-      catchError((error: any) => {
-        console.error(
-          `${this.logPrefix} Error searching merchants by category "${category}":`,
-          error
-        );
-        return of([]);
-      })
-    );
+    return this.crudService
+      .createWrapped<any, Merchant[]>(`${this.endpoint}/filter`, filterDto)
+      .pipe(
+        map((response: ApiResponse<Merchant[]>) => {
+          if (response && response.success) {
+            return response.data || [];
+          }
+          return [];
+        }),
+        catchError((error: any) => {
+          console.error(
+            `${this.logPrefix} Error filtering merchants:`,
+            error
+          );
+          return of([]);
+        })
+      );
   }
 
   //#region Private Helper Methods

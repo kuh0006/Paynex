@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using MM.Contracts;
 using MM.Entities.DTOs.Merchant;
 using MM.Entities.Filters.Composite;
-using MM.Entities.Filters.Interfaces;
 using MM.Entities.Models;
 using MM.Services.Interfaces;
 
@@ -113,60 +112,6 @@ namespace MM.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving the merchant with ID: {Id}", id);
-                throw;
-            }
-        }
-
-        public async Task<IEnumerable<MerchantReadDto>> GetByNameAsync(string name)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    _logger.LogError("Name parameter is null or empty");
-                    throw new ArgumentException("Name cannot be null or empty", nameof(name));
-                }
-
-                _logger.LogInformation("Retrieving merchants by name: {Name}", name);
-
-                IEnumerable<Merchant>? merchants = await
-                    _repository.Merchant.GetMerchantsByNameAsync(name);
-
-                if (!merchants.Any())
-                    _logger.LogWarning("No merchants found with name: {Name}", name);
-
-                return _mapper.Map<IEnumerable<MerchantReadDto>>(merchants);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving merchants by name: {Name}", name);
-                throw;
-            }
-        }
-
-        public async Task<IEnumerable<MerchantReadDto>> GetByCategoryAsync(string category)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(category))
-                {
-                    _logger.LogError("Category parameter is null or empty");
-                    throw new ArgumentException("Category cannot be null or empty", nameof(category));
-                }
-
-                _logger.LogInformation("Retrieving merchants by category: {Category}", category);
-
-                IEnumerable<Merchant>? merchants = await
-                    _repository.Merchant.GetMerchantsByCategoryAsync(category);
-
-                if (!merchants.Any())
-                    _logger.LogWarning("No merchants found with category: {Category}", category);
-
-                return _mapper.Map<IEnumerable<MerchantReadDto>>(merchants);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving merchants by category: {Category}", category);
                 throw;
             }
         }

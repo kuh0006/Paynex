@@ -57,52 +57,6 @@ namespace MM.Api.Controllers
             return Ok(ApiResponse<MerchantReadDto>.SuccessResponse(merchant, "Merchant retrieved successfully."));
         }
 
-        [HttpGet("name/{name}")]
-        public async Task<IActionResult> GetMerchantsByName(string name)
-        {
-            _logger.LogInformation("GetMerchantsByName called for Name: {Name}", name);
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                _logger.LogError("Name parameter is null or empty");
-                return BadRequest(ApiResponse<MerchantReadDto>.FailResponse("Name parameter cannot be null or empty."));
-            }
-
-            IEnumerable<MerchantReadDto> merchants = await _merchantService.GetByNameAsync(name);
-
-            if (merchants == null || !merchants.Any())
-            {
-                _logger.LogInformation("No merchants found with name: {Name}", name);
-                return NotFound(ApiResponse<MerchantReadDto>.NotFound("No merchants found with the specified name."));
-            }
-
-            _logger.LogInformation("Retrieved {Count} merchants with name: {Name}", merchants.Count(), name);
-            return Ok(ApiResponse<IEnumerable<MerchantReadDto>>.SuccessResponse(merchants, "Merchants retrieved successfully."));
-        }
-
-        [HttpGet("category/{category}")]
-        public async Task<IActionResult> GetMerchantsByCategory(string category)
-        {
-            _logger.LogInformation("GetMerchantsByCategory called for Category: {Category}", category);
-
-            if (string.IsNullOrWhiteSpace(category))
-            {
-                _logger.LogError("Category parameter is null or empty");
-                return BadRequest(ApiResponse<MerchantReadDto>.FailResponse("Category parameter cannot be null or empty."));
-            }
-
-            IEnumerable<MerchantReadDto> merchants = await _merchantService.GetByCategoryAsync(category);
-
-            if (merchants == null || !merchants.Any())
-            {
-                _logger.LogInformation("No merchants found with category: {Category}", category);
-                return NotFound(ApiResponse<MerchantReadDto>.NotFound("No merchants found with the specified category."));
-            }
-
-            _logger.LogInformation("Retrieved {Count} merchants with category: {Category}", merchants.Count(), category);
-            return Ok(ApiResponse<IEnumerable<MerchantReadDto>>.SuccessResponse(merchants, "Merchants retrieved successfully."));
-        }
-
         [HttpPost("filter")]
         public async Task<IActionResult> GetFilteredMerchants([FromBody] MerchantFilterDto filterDto)
         {
