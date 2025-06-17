@@ -61,11 +61,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(
-    private merchantService: MerchantService,
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar
-  ) {
+  constructor(private merchantService: MerchantService, private dialog: MatDialog, private snackBar: MatSnackBar) {
     // Reactive filtering
     this.filteredMerchants$ = combineLatest([
       this.merchants$.asObservable(),
@@ -151,6 +147,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private updateLocalMerchant(updatedMerchant: Merchant): void {
     const currentMerchants = this.merchants$.value;
+   
     const index = currentMerchants.findIndex(
       (m) => m.id === updatedMerchant.id
     );
@@ -159,6 +156,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       currentMerchants[index] = updatedMerchant;
       this.merchants$.next([...currentMerchants]);
     }
+
   }
   private addLocalMerchant(newMerchant: Merchant): void {
     const currentMerchants = this.merchants$.value;
@@ -193,6 +191,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
+
   private deleteMerchant(id: number): void {
     this.isLoading = true;
     this.merchantService
@@ -203,7 +202,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit, OnDestroy {
       )
       .subscribe({
         next: () => {
-          this.removeLocalMerchant(id); // ✅ Aktualizuje lokálne dáta
+          this.removeLocalMerchant(id);
           this.snackBar.open('Merchant deleted successfully', 'Close', {
             duration: 3000,
           });
