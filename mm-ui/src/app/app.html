@@ -14,10 +14,14 @@
       </button>
     </div>
   </mat-toolbar>
-
   <div class="app-content">
     <mat-sidenav-container class="sidenav-container">
-      <mat-sidenav [mode]="isSmallScreen ? 'over' : 'side'" [opened]="sidenavOpened" class="sidenav mat-elevation-z2">        <mat-nav-list>
+      <mat-sidenav [mode]="isSmallScreen ? 'over' : 'side'" 
+                   [opened]="sidenavOpened" 
+                   class="sidenav mat-elevation-z2" 
+                   [fixedInViewport]="true" 
+                   [fixedTopGap]="64">
+        <mat-nav-list>
           <a mat-list-item routerLink="/merchants" routerLinkActive="mat-mdc-list-item-active">
             <mat-icon matListItemIcon>store</mat-icon>
             <span matListItemTitle>Merchants</span>
