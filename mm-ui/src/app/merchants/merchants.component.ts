@@ -78,6 +78,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
         },
       });
   }
+  
   /**
    * Sets up combined filtering by name and category
    */
