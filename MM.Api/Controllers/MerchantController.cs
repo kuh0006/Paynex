@@ -118,7 +118,6 @@ namespace MM.Api.Controllers
 
             IEnumerable<MerchantReadDto> result = await _merchantService.GetFilteredAsync(filter);
 
-
             if (result == null || !result.Any())
             {
                 _logger.LogInformation("No merchants found matching the filter criteria");
