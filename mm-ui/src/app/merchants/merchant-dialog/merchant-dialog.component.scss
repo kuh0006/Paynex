@@ -1,12 +1,55 @@
-.full-width {
-  width: 100%;
-  margin-bottom: 16px;
-}
+.merchant-dialog {
+  min-width: 400px;
+  
+  .dialog-title {
+    display: flex;
+    align-items: center;
+    color: #333;
+    margin-bottom: 0;
+    padding: 16px;
+    
+    .title-icon {
+      margin-right: 12px;
+      font-size: 24px;
+      height: 24px;
+      width: 24px;
+    }
+  }
 
-[mat-dialog-title] {
-  margin-bottom: 16px;
-}
-
-[mat-dialog-actions] {
-  padding: 16px 0 0;
+  .dialog-content {
+    padding: 24px 16px 8px;
+  }
+  
+  .full-width {
+    width: 100%;
+    margin-bottom: 20px;
+    
+    .field-icon {
+      margin-right: 8px;
+      opacity: 0.8;
+    }
+  }
+  
+  mat-form-field {
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  .dialog-actions {
+    padding: 16px;
+    margin: 0;
+    
+    button {
+      min-width: 100px;
+      
+      mat-icon {
+        margin-right: 6px;
+      }
+    }
+    
+    .submit-button {
+      margin-left: 16px;
+    }
+  }
 }

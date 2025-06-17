@@ -1,123 +1,173 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UtilityService } from './utility.service';
-import { catchError, map, Observable } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
+import { ApiResponse } from '../../models/merchant.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CrudService {
-  constructor(
-    private _http: HttpClient,
-    private _utilityService: UtilityService
-  ) {}
+  private logPrefix = '[CrudService]';
 
-  postRequest<T>(url: string, data: T): Observable<HttpResponse<T>> {
-    const route = this._utilityService.createCompleteRoute(url);
+  constructor(private _http: HttpClient, private _utilityService: UtilityService) {}
 
-    return this._http.post<T>(route, data, { observe: 'response' }).pipe(
-      map((response) => response as HttpResponse<T>),
-      catchError((error) => {
-        console.error('Error:', error);
-        throw error;
-      })
-    );
-  }
+  // ===== UNWRAPPED METHODS (return direct data) =====
 
   /**
-   * Retrieves all items from the specified route.
-   *
-   * @template T - The type of the items to retrieve.
-   * @param {string} route - The route to retrieve the items from.
-   * @returns {Observable<HttpResponse<T[]>>} - An observable that emits an HTTP response containing an array of items.
+   * Get all items without ApiResponse wrapper
    */
   getAll<T>(route: string): Observable<HttpResponse<T[]>> {
-    const url = this._utilityService.createCompleteRoute(route);
-    return this._http.get<T[]>(url, { observe: 'response' });
+    return this.makeUnwrappedRequest<T[]>('GET', route);
   }
 
   /**
-   * Retrieves an item by its ID from the specified route.
-   *
-   * @template T - The type of the item to be retrieved. T must implement the Identifiable interface.
-   * @param {string} route - The route to fetch the item from.
-   * @param {string | number} id - The ID of the item to retrieve.
-   * @returns {Observable<HttpResponse<T>>} - An Observable that emits the HTTP response containing the retrieved item.
-   * @throws {any} - Throws an error if there was an issue fetching the item.
+   * Get item by ID without ApiResponse wrapper
    */
-  getItemById<T>(
+  getById<T>(route: string, id: string | number): Observable<HttpResponse<T>> {
+    return this.makeUnwrappedRequest<T>('GET', `${route}/${id}`);
+  }
+
+  /**
+   * Create record without ApiResponse wrapper
+   */
+  create<TRequest, TResponse>(route: string, data: TRequest): Observable<HttpResponse<TResponse>> {
+    return this.makeUnwrappedRequest<TResponse>('POST', route, data);
+  }
+
+  /**
+   * Update record without ApiResponse wrapper
+   */
+  update<TRequest, TResponse>(route: string, data: TRequest): Observable<HttpResponse<TResponse>> {
+    return this.makeUnwrappedRequest<TResponse>('PUT', route, data);
+  }
+
+  /**
+   * Delete item without ApiResponse wrapper
+   */
+  delete(route: string, id: string | number): Observable<HttpResponse<void>> {
+    return this.makeUnwrappedRequest<void>('DELETE', `${route}/${id}`);
+  }
+
+  // ===== WRAPPED METHODS (return ApiResponse<T>) =====
+
+  /**
+   * Get all items with ApiResponse wrapper
+   */
+  getAllWrapped<T>(route: string): Observable<ApiResponse<T[]>> {
+    return this.makeWrappedRequest<T[]>('GET', route);
+  }
+
+  /**
+   * Get item by ID with ApiResponse wrapper
+   */
+  getByIdWrapped<T>(
     route: string,
     id: string | number
-  ): Observable<HttpResponse<T>> {
-    const url = this._utilityService.createCompleteRoute(`${route}/${id}`);
-
-    return this._http.get<T>(url, { observe: 'response' }).pipe(
-      map((response) => response),
-      catchError((error) => {
-        console.error(`Error fetching item with ID ${id}:`, error);
-        throw error;
-      })
-    );
+  ): Observable<ApiResponse<T>> {
+    return this.makeWrappedRequest<T>('GET', `${route}/${id}`);
   }
 
   /**
-   * Creates a record by sending a POST request to the specified route with the provided data.
-   *
-   * @param route - The route to send the POST request to.
-   * @param data - The data to be sent in the request body.
-   * @returns An Observable that emits an HttpResponse containing the response data.
-   * @throws If an error occurs during the request.
+   * Create record with ApiResponse wrapper
    */
-  createRecord<T>(route: string, data: T): Observable<HttpResponse<T>> {
-    const url = this._utilityService.createCompleteRoute(route);
-
-    return this._http.post<T>(url, data, { observe: 'response' }).pipe(
-      map((response) => response as HttpResponse<T>),
-      catchError((error) => {
-        console.error('Error creating record:', error);
-        throw error;
-      })
-    );
+  createWrapped<TRequest, TResponse>(route: string, data: TRequest): Observable<ApiResponse<TResponse>> {
+    return this.makeWrappedRequest<TResponse>('POST', route, data);
   }
 
   /**
-   * Edits an item by sending a PUT request to the specified route with the provided data.
-   *
-   * @param route - The route to send the PUT request to.
-   * @param data - The data to be sent in the request body.
-   * @returns An Observable that emits an HttpResponse containing the edited item.
-   * @throws If an error occurs during the request.
+   * Update record with ApiResponse wrapper
    */
-  edit<T>(
+  updateWrapped<TRequest, TResponse>(route: string, data: TRequest): Observable<ApiResponse<TResponse>> {
+    return this.makeWrappedRequest<TResponse>('PUT', route, data);
+  }
+
+  /**
+   * Delete item with ApiResponse wrapper
+   */
+  deleteWrapped(
     route: string,
-    data: T
-  ): Observable<HttpResponse<T>> {
-    const url = this._utilityService.createCompleteRoute(route);
+    id: string | number
+  ): Observable<ApiResponse<boolean>> {
+    return this.makeWrappedRequest<boolean>('DELETE', `${route}/${id}`);
+  }
 
-    return this._http.put<T>(url, data, { observe: 'response' }).pipe(
-      map((response) => response as HttpResponse<T>),
-      catchError((error) => {
-        console.error('Error editing item:', error);
-        throw error;
-      })
+  // ===== PRIVATE HELPER METHODS =====
+  private handleError(
+    operation: string,
+    context?: string
+  ): (error: any) => Observable<never> {
+    return (error: any) => {
+      const message = context
+        ? `${this.logPrefix} ${operation} ${context} failed:`
+        : `${this.logPrefix} ${operation} failed:`;
+      console.error(message, error);
+      return throwError(() => error);
+    };
+  }
+
+  /**
+   * Makes HTTP request expecting direct data (no ApiResponse wrapper)
+   */
+  private makeUnwrappedRequest<TResponse>(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    url: string,
+    data?: any
+  ): Observable<HttpResponse<TResponse>> {
+    const completeUrl = this._utilityService.createCompleteRoute(url);
+    const options = { observe: 'response' as const };
+
+    let request$: Observable<HttpResponse<TResponse>>;
+
+    switch (method) {
+      case 'GET':
+        request$ = this._http.get<TResponse>(completeUrl, options);
+        break;
+      case 'POST':
+        request$ = this._http.post<TResponse>(completeUrl, data, options);
+        break;
+      case 'PUT':
+        request$ = this._http.put<TResponse>(completeUrl, data, options);
+        break;
+      case 'DELETE':
+        request$ = this._http.delete<TResponse>(completeUrl, options);
+        break;
+    }
+
+    return request$.pipe(
+      catchError(this.handleError(method.toLowerCase(), url))
     );
   }
 
   /**
-   * Deletes an item from the specified route using the provided ID.
-   *
-   * @param route - The route to delete the item from.
-   * @param id - The ID of the item to delete.
-   * @returns A promise that resolves to a boolean indicating whether the deletion was successful.
+   * Makes HTTP request expecting ApiResponse<T> wrapper
    */
-  deleteItem(route: string, id: string | number): Observable<void> {
-    const url = this._utilityService.createCompleteRoute(`${route}/${id}`);
-    return this._http.delete<void>(url, { observe: 'response' }).pipe(
-      map((response) => {
-        if (!response.ok) {
-          throw new Error('Deletion was not successful');
-        }
-      })
+  private makeWrappedRequest<TResponse>(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    url: string,
+    data?: any
+  ): Observable<ApiResponse<TResponse>> {
+    const completeUrl = this._utilityService.createCompleteRoute(url);
+
+    let request$: Observable<ApiResponse<TResponse>>;
+
+    switch (method) {
+      case 'GET':
+        request$ = this._http.get<ApiResponse<TResponse>>(completeUrl);
+        break;
+      case 'POST':
+        request$ = this._http.post<ApiResponse<TResponse>>(completeUrl, data);
+        break;
+      case 'PUT':
+        request$ = this._http.put<ApiResponse<TResponse>>(completeUrl, data);
+        break;
+      case 'DELETE':
+        request$ = this._http.delete<ApiResponse<TResponse>>(completeUrl);
+        break;
+    }
+
+    return request$.pipe(
+      catchError(this.handleError(method.toLowerCase(), url))
     );
   }
 }

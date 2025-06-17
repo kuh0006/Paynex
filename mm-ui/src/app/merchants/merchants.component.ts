@@ -75,8 +75,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
     this.isLoading = true;
     this.error = null;
 
-    this.merchantService
-      .getAllMerchants()
+    this.merchantService.getAllMerchants()
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: (merchants) => {
@@ -134,6 +133,7 @@ export class MerchantsComponent implements OnInit, AfterViewInit {
         });
     }
   }
+  
   /**
    * Opens dialog to add a new merchant
    */

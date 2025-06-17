@@ -1,89 +1,100 @@
 import { Injectable } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, catchError, of } from 'rxjs';
 import { CrudService } from '../shared/services/crud.service';
-import { Merchant } from '../models/merchant.model';
+import { Merchant, ApiResponse } from '../models/merchant.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MerchantService {
   private endpoint = 'merchant';
+  private logPrefix = '[MerchantService]';
 
-  constructor(private crudService: CrudService) { }
-  /**
-   * Gets all merchants.
-   * @returns Observable of merchant array
-   */
+  constructor(private crudService: CrudService) {}
+
   getAllMerchants(): Observable<Merchant[]> {
-    return this.crudService.getAll<Merchant>(`${this.endpoint}/all`).pipe(
-      map((response: HttpResponse<Merchant[]>) => {
-        console.log('Response from getAllMerchants:', response);
-        return response.body || [];
-      })
-    );
+    return this.crudService
+      .getAllWrapped<Merchant>(`${this.endpoint}/all`)
+      .pipe(
+        map((response) => this.extractDataFromResponse<Merchant[]>(response)),
+        catchError(this.handleError<Merchant[]>('getAllMerchants', []))
+      );
   }
 
-  /**
-   * Gets a merchant by ID.
-   * @param id The merchant ID
-   * @returns Observable of merchant
-   */
   getMerchantById(id: number): Observable<Merchant> {
-    return this.crudService.getItemById<Merchant>(this.endpoint, id).pipe(
-      map((response: HttpResponse<Merchant>) => {
-        return response.body as Merchant;
-      })
+    return this.crudService.getByIdWrapped<Merchant>(this.endpoint, id).pipe(
+      map((response) => this.extractDataFromResponse<Merchant>(response)),
+      catchError(this.handleError<Merchant>(`getMerchantById(${id})`))
     );
   }
 
-  /**
-   * Creates a new merchant.
-   * @param merchant The merchant data
-   * @returns Observable of the created merchant
-   */
-  createMerchant(merchant: Merchant): Observable<Merchant> {
-    return this.crudService.createRecord<Merchant>(this.endpoint, merchant).pipe(
-      map((response: HttpResponse<Merchant>) => {
-        return response.body as Merchant;
-      })
-    );
+  createMerchant(merchant: Merchant): Observable<boolean> {
+    return this.crudService
+      .createWrapped<Merchant, boolean>(this.endpoint, merchant)
+      .pipe(
+        map((response: ApiResponse<boolean>) =>
+          this.extractDataFromResponse<boolean>(response)
+        ),
+        catchError(this.handleError<boolean>(`createMerchant (${merchant})`))
+      );
   }
 
-  /**
-   * Updates an existing merchant.
-   * @param id The merchant ID
-   * @param merchant The updated merchant data
-   * @returns Observable of the updated merchant
-   */
-  updateMerchant(id: number, merchant: Merchant): Observable<Merchant> {
+  updateMerchant(id: number, merchant: Merchant): Observable<boolean> {
     const route = `${this.endpoint}/${id}`;
-    return this.crudService.edit<Merchant>(route, merchant).pipe(
-      map((response: HttpResponse<Merchant>) => {
-        return response.body as Merchant;
+    return this.crudService
+      .updateWrapped<Merchant, boolean>(route, merchant)
+      .pipe(
+        map((response: ApiResponse<boolean>) =>
+          this.extractDataFromResponse<boolean>(response)
+        ),
+        catchError(this.handleError<boolean>(`updateMerchant(${id})`))
+      );
+  }
+
+  deleteMerchant(id: number): Observable<boolean> {
+    return this.crudService.deleteWrapped(this.endpoint, id).pipe(
+      map((response: ApiResponse<boolean>) =>
+        this.extractDataFromResponse<boolean>(response)
+      ),
+      catchError(this.handleError<boolean>(`deleteMerchant(${id})`, false))
+    );
+  }
+
+  searchMerchantsByName(name: string): Observable<Merchant[]> {
+    const route = `${this.endpoint}/name/${encodeURIComponent(name)}`;
+
+    return this.crudService.getAllWrapped<Merchant>(route).pipe(
+      map((response: ApiResponse<Merchant[]>) => {
+        if (response && response.success) {
+          return response.data || [];
+        }
+        return [];
+      }),
+      catchError((error: any) => {
+        console.error(
+          `${this.logPrefix} Error searching merchants by name "${name}":`,
+          error
+        );
+        return of([]);
       })
     );
   }
 
-  /**
-   * Deletes a merchant by ID.
-   * @param id The merchant ID
-   * @returns Observable of void
-   */
-  deleteMerchant(id: number): Observable<void> {
-    return this.crudService.deleteItem(this.endpoint, id);
-  }
-  /**
-   * Searches merchants by name.
-   * @param name The name to search for
-   * @returns Observable of merchant array
-   */
-  searchMerchantsByName(name: string): Observable<Merchant[]> {
-    const route = `${this.endpoint}/search?name=${encodeURIComponent(name)}`;
-    return this.crudService.getAll<Merchant>(route).pipe(
-      map((response: HttpResponse<Merchant[]>) => {
-        return response.body || [];
-      })
-    );
-  }
+  //#region Private Helper Methods
+  private extractDataFromResponse = <T>(response: ApiResponse<T>): T => {
+    if (response && response.success) return response.data;
+
+    throw new Error(response?.message || 'API request failed');
+  };
+
+  private handleError = <T>(operation: string, fallbackValue?: T) => {
+    return (error: any): Observable<T> => {
+      console.error(`${this.logPrefix} ${operation} failed:`, error);
+
+      if (fallbackValue !== undefined) return of(fallbackValue);
+
+      throw error;
+    };
+  };
+  //#endregion
 }
